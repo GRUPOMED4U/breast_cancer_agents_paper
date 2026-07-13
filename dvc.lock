@@ -1,0 +1,519 @@
+schema: '2.0'
+stages:
+  prepare_case_summaries:
+    cmd: python prepare_case_summaries.py
+    deps:
+    - path: data/cases_stage_1.csv
+      hash: md5
+      md5: e549d773e1deb6377a2e2cc49a4dfea1
+      size: 57735
+    - path: data/cases_stage_2.csv
+      hash: md5
+      md5: edd06126e8bd4e331ad605c4dc64d942
+      size: 43336
+    - path: data/cases_stage_3.csv
+      hash: md5
+      md5: e6e043d23af41d688e9ffa6b6f2a199e
+      size: 43764
+    - path: data/cases_stage_4.csv
+      hash: md5
+      md5: e0070cc0036a92dab7850646bca9822c
+      size: 43615
+    - path: prepare_case_summaries.py
+      hash: md5
+      md5: 6ba0da559809d7441226fe88c7e4b889
+      size: 2563
+    outs:
+    - path: data/case_summaries.jsonl
+      hash: md5
+      md5: 3e432f79c9455184a8eb1285c36752e1
+      size: 123413
+  generate_rubrics:
+    cmd: python generate_rubrics.py
+    deps:
+    - path: data/case_summaries.jsonl
+      hash: md5
+      md5: 3e432f79c9455184a8eb1285c36752e1
+      size: 123413
+    - path: generate_rubrics.py
+      hash: md5
+      md5: 25455c917623b466123837a6e4a177d6
+      size: 6060
+    params:
+      agent_definitions.yaml:
+        rubric_generator:
+          name: Rubric Generator
+          model: gemini/gemini-3.5-flash
+          model_settings:
+            reasoning:
+              effort: high
+          instructions: "Role: Your task is to generate a set of rubrics to evaluate
+            the quality of treatment recommendations for breast cancer patients. \n\
+            # Goal\nYou will be provided with the treatment decisions made by the
+            patient's oncologist. Use them as a reference when generating the rubrics.
+            You need to generate a set of rubrics that can be used to evaluate the
+            quality of the treatment recommendations provided by a treatment recommender
+            system.\n# Resources\nYou will have access to web search, PubMed search
+            and be able to fetch full webpages and full PMC articles if needed. You
+            must use those resources to generate the final set of rubrics.\n# Constraints\n\
+            In some cases, more than one treatment option is available. Make sure
+            that these options are reflected in the rubrics you generate. \nMake the
+            rubrics as specific and concise as possible. It is preferrable to have
+            many concise rubrics than a few long rubrics.\nAssume that the treatment
+            recommender that will be evaluated using the rubrics you generate will
+            only have access to the case summary. Sometimes, previous treatments received
+            by the patient are not explicitly mentioned in the case summary, but they
+            are part of the treatment decisions made by the oncologist. In those cases,
+            you should include those treatments as part of the rubrics you generate
+            and not assume the patient had already received them. Only assume the
+            patient has received treatments that are explicitly mentioned in the case
+            summary.\nYou must create at least one rubric for each of the following
+            categories: - systemic_therapy - surgery - radiotherapy - complementary_exams\n\
+            You can add rubrics with negative points if applicable. For example, if
+            the system being evaluated includes prescriptions of contraindicated procedures,
+            you can create a rubric like \"recommends a contraindicated procedure\"\
+            \ with negative points.\nEach rubric category can have multiple rubrics,
+            for example, if the official recommendations provide a list of systemic
+            therapy options, you can create a rubric for each of those options.\n\
+            If action is recommended a specific treatment category, you should create
+            a rubric that states that no action is recommended in that category.\n\
+            Your response must be in JSON format following the schema provided. \n"
+          output_type: RubricList
+    outs:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+  single_llm_zero_shot@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      single_llm_zero_shot --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_zero_shot.yaml
+      hash: md5
+      md5: 5d5d4666bbe2224a32c50c27e5fb8634
+      size: 8506
+    - path: pipelines/single_llm_zero_shot.py
+      hash: md5
+      md5: d97fc408282489ddee8bf69d3075ae2e
+      size: 3656
+  single_llm_with_pubmed_search@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      single_llm_with_pubmed_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search.yaml
+      hash: md5
+      md5: c05e81bc86b1fbbc6a9cfad4e667e7f0
+      size: 7933
+    - path: pipelines/single_llm_with_pubmed_search.py
+      hash: md5
+      md5: 162a73ac37070cd7e4383557116b8e42
+      size: 5916
+  single_llm_with_web_search@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      single_llm_with_web_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_web_search.yaml
+      hash: md5
+      md5: e5079afe1a7f176bffba41a18f7b7605
+      size: 7577
+    - path: pipelines/single_llm_with_web_search.py
+      hash: md5
+      md5: 01a56d2285b5ed7b550f25cc63e77bfc
+      size: 5838
+  single_llm_zero_shot@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      single_llm_zero_shot --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_zero_shot.yaml
+      hash: md5
+      md5: 5d5d4666bbe2224a32c50c27e5fb8634
+      size: 8506
+    - path: pipelines/single_llm_zero_shot.py
+      hash: md5
+      md5: d97fc408282489ddee8bf69d3075ae2e
+      size: 3656
+  single_llm_zero_shot@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline single_llm_zero_shot --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_zero_shot.yaml
+      hash: md5
+      md5: 5d5d4666bbe2224a32c50c27e5fb8634
+      size: 8506
+    - path: pipelines/single_llm_zero_shot.py
+      hash: md5
+      md5: d97fc408282489ddee8bf69d3075ae2e
+      size: 3656
+  single_llm_zero_shot@gpt-5.5-2026-04-23:
+    cmd: python run_inference.py --model gpt-5.5-2026-04-23 --pipeline 
+      single_llm_zero_shot --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_zero_shot.yaml
+      hash: md5
+      md5: 5d5d4666bbe2224a32c50c27e5fb8634
+      size: 8506
+    - path: pipelines/single_llm_zero_shot.py
+      hash: md5
+      md5: d97fc408282489ddee8bf69d3075ae2e
+      size: 3656
+  single_llm_zero_shot@anthropic/claude-opus-4-8:
+    cmd: python run_inference.py --model anthropic/claude-opus-4-8 --pipeline 
+      single_llm_zero_shot --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_zero_shot.yaml
+      hash: md5
+      md5: 5d5d4666bbe2224a32c50c27e5fb8634
+      size: 8506
+    - path: pipelines/single_llm_zero_shot.py
+      hash: md5
+      md5: d97fc408282489ddee8bf69d3075ae2e
+      size: 3656
+  single_llm_with_web_search@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      single_llm_with_web_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_web_search.yaml
+      hash: md5
+      md5: e5079afe1a7f176bffba41a18f7b7605
+      size: 7577
+    - path: pipelines/single_llm_with_web_search.py
+      hash: md5
+      md5: 01a56d2285b5ed7b550f25cc63e77bfc
+      size: 5838
+  single_llm_with_web_search@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline single_llm_with_web_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_web_search.yaml
+      hash: md5
+      md5: e5079afe1a7f176bffba41a18f7b7605
+      size: 7577
+    - path: pipelines/single_llm_with_web_search.py
+      hash: md5
+      md5: 01a56d2285b5ed7b550f25cc63e77bfc
+      size: 5838
+  single_llm_with_web_search@gpt-5.5-2026-04-23:
+    cmd: python run_inference.py --model gpt-5.5-2026-04-23 --pipeline 
+      single_llm_with_web_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_web_search.yaml
+      hash: md5
+      md5: e5079afe1a7f176bffba41a18f7b7605
+      size: 7577
+    - path: pipelines/single_llm_with_web_search.py
+      hash: md5
+      md5: 01a56d2285b5ed7b550f25cc63e77bfc
+      size: 5838
+  single_llm_with_pubmed_search@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      single_llm_with_pubmed_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search.yaml
+      hash: md5
+      md5: c05e81bc86b1fbbc6a9cfad4e667e7f0
+      size: 7933
+    - path: pipelines/single_llm_with_pubmed_search.py
+      hash: md5
+      md5: 162a73ac37070cd7e4383557116b8e42
+      size: 5916
+  single_llm_with_pubmed_search@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline single_llm_with_pubmed_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search.yaml
+      hash: md5
+      md5: c05e81bc86b1fbbc6a9cfad4e667e7f0
+      size: 7933
+    - path: pipelines/single_llm_with_pubmed_search.py
+      hash: md5
+      md5: 162a73ac37070cd7e4383557116b8e42
+      size: 5916
+  single_llm_with_pubmed_search@gpt-5.5-2026-04-23:
+    cmd: python run_inference.py --model gpt-5.5-2026-04-23 --pipeline 
+      single_llm_with_pubmed_search --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search.yaml
+      hash: md5
+      md5: c05e81bc86b1fbbc6a9cfad4e667e7f0
+      size: 7933
+    - path: pipelines/single_llm_with_pubmed_search.py
+      hash: md5
+      md5: 162a73ac37070cd7e4383557116b8e42
+      size: 5916
+  single_llm_with_pubmed_search_and_full_pmc_articles@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      single_llm_with_pubmed_search_and_full_pmc_articles --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search_and_full_pmc_articles.yaml
+      hash: md5
+      md5: f8077d2112c49184b453bc7adb7148f7
+      size: 9781
+    - path: pipelines/single_llm_with_pubmed_search_and_full_pmc_articles.py
+      hash: md5
+      md5: 2d16ac6884973b9c576fd0322314019a
+      size: 6095
+  single_llm_with_pubmed_search_and_full_pmc_articles@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      single_llm_with_pubmed_search_and_full_pmc_articles --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search_and_full_pmc_articles.yaml
+      hash: md5
+      md5: f8077d2112c49184b453bc7adb7148f7
+      size: 9781
+    - path: pipelines/single_llm_with_pubmed_search_and_full_pmc_articles.py
+      hash: md5
+      md5: 2d16ac6884973b9c576fd0322314019a
+      size: 6095
+  single_llm_with_pubmed_search_and_full_pmc_articles@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline single_llm_with_pubmed_search_and_full_pmc_articles 
+      --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/single_llm_with_pubmed_search_and_full_pmc_articles.yaml
+      hash: md5
+      md5: f8077d2112c49184b453bc7adb7148f7
+      size: 9781
+    - path: pipelines/single_llm_with_pubmed_search_and_full_pmc_articles.py
+      hash: md5
+      md5: 2d16ac6884973b9c576fd0322314019a
+      size: 6095
+  divide_and_conquer@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      divide_and_conquer --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer.yaml
+      hash: md5
+      md5: 0df1e657182d46f7861c2ec719f4da8d
+      size: 43067
+    - path: pipelines/divide_and_conquer.py
+      hash: md5
+      md5: 84b699f570c9efbda5669a38fe487741
+      size: 12705
+  divide_and_conquer@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      divide_and_conquer --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer.yaml
+      hash: md5
+      md5: 0df1e657182d46f7861c2ec719f4da8d
+      size: 43067
+    - path: pipelines/divide_and_conquer.py
+      hash: md5
+      md5: 84b699f570c9efbda5669a38fe487741
+      size: 12705
+  divide_and_conquer@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline divide_and_conquer --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer.yaml
+      hash: md5
+      md5: 0df1e657182d46f7861c2ec719f4da8d
+      size: 43067
+    - path: pipelines/divide_and_conquer.py
+      hash: md5
+      md5: 84b699f570c9efbda5669a38fe487741
+      size: 12705
+  divide_and_conquer_with_fact_checker@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      divide_and_conquer_with_fact_checker --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_fact_checker.yaml
+      hash: md5
+      md5: 84af967a42b0979d3ea76319e277e06f
+      size: 54470
+    - path: pipelines/divide_and_conquer_with_fact_checker.py
+      hash: md5
+      md5: 91939e2086353cd81bacc40b7cb77ffb
+      size: 17109
+  divide_and_conquer_with_fact_checker@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      divide_and_conquer_with_fact_checker --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_fact_checker.yaml
+      hash: md5
+      md5: 84af967a42b0979d3ea76319e277e06f
+      size: 54470
+    - path: pipelines/divide_and_conquer_with_fact_checker.py
+      hash: md5
+      md5: 91939e2086353cd81bacc40b7cb77ffb
+      size: 17109
+  divide_and_conquer_with_fact_checker@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline divide_and_conquer_with_fact_checker --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_fact_checker.yaml
+      hash: md5
+      md5: 84af967a42b0979d3ea76319e277e06f
+      size: 54470
+    - path: pipelines/divide_and_conquer_with_fact_checker.py
+      hash: md5
+      md5: 91939e2086353cd81bacc40b7cb77ffb
+      size: 17109
+  divide_and_conquer_with_subagents_auto_spawning@gemini/gemini-3.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-3.5-flash --pipeline 
+      divide_and_conquer_with_subagents_auto_spawning --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_subagents_auto_spawning.yaml
+      hash: md5
+      md5: 509e3c8b5bd90c2f9c3698432bae849a
+      size: 29668
+    - path: pipelines/divide_and_conquer_with_subagents_auto_spawning.py
+      hash: md5
+      md5: 11bf74a43e09c5fd1da2f3b7277314ff
+      size: 25788
+  divide_and_conquer_with_subagents_auto_spawning@gemini/gemini-2.5-flash:
+    cmd: python run_inference.py --model gemini/gemini-2.5-flash --pipeline 
+      divide_and_conquer_with_subagents_auto_spawning --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_subagents_auto_spawning.yaml
+      hash: md5
+      md5: 509e3c8b5bd90c2f9c3698432bae849a
+      size: 29668
+    - path: pipelines/divide_and_conquer_with_subagents_auto_spawning.py
+      hash: md5
+      md5: 11bf74a43e09c5fd1da2f3b7277314ff
+      size: 25788
+  divide_and_conquer_with_subagents_auto_spawning@gemini/gemini-3.1-pro-preview:
+    cmd: python run_inference.py --model gemini/gemini-3.1-pro-preview 
+      --pipeline divide_and_conquer_with_subagents_auto_spawning --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_subagents_auto_spawning.yaml
+      hash: md5
+      md5: 509e3c8b5bd90c2f9c3698432bae849a
+      size: 29668
+    - path: pipelines/divide_and_conquer_with_subagents_auto_spawning.py
+      hash: md5
+      md5: 11bf74a43e09c5fd1da2f3b7277314ff
+      size: 25788
+  divide_and_conquer_with_subagents_auto_spawning@gpt-5.5-2026-04-23:
+    cmd: python run_inference.py --model gpt-5.5-2026-04-23 --pipeline 
+      divide_and_conquer_with_subagents_auto_spawning --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_subagents_auto_spawning.yaml
+      hash: md5
+      md5: 509e3c8b5bd90c2f9c3698432bae849a
+      size: 29668
+    - path: pipelines/divide_and_conquer_with_subagents_auto_spawning.py
+      hash: md5
+      md5: 11bf74a43e09c5fd1da2f3b7277314ff
+      size: 25788
+  divide_and_conquer_with_subagents_auto_spawning@anthropic/claude-opus-4-8:
+    cmd: python run_inference.py --model anthropic/claude-opus-4-8 --pipeline 
+      divide_and_conquer_with_subagents_auto_spawning --save-steps 10
+    deps:
+    - path: data/eval_dataset.jsonl
+      hash: md5
+      md5: 4456766f9883917edda4fd80019bb8b7
+      size: 434258
+    - path: experiments/divide_and_conquer_with_subagents_auto_spawning.yaml
+      hash: md5
+      md5: 509e3c8b5bd90c2f9c3698432bae849a
+      size: 29668
+    - path: pipelines/divide_and_conquer_with_subagents_auto_spawning.py
+      hash: md5
+      md5: 11bf74a43e09c5fd1da2f3b7277314ff
+      size: 25788

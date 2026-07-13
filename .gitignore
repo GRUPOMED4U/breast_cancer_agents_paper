@@ -1,0 +1,12 @@
+.venv
+.env
+__pycache__
+*.ipynb
+temp
+obscura-worker.exe
+obscura.exe
+pipelines/divide_and_conquer_with_references.py
+reference_validators.py
+eval_dataset_eda
+evals/*
+results/*

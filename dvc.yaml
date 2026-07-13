@@ -1,0 +1,118 @@
+stages:
+  prepare_case_summaries:
+    cmd: python prepare_case_summaries.py
+    deps:
+      - prepare_case_summaries.py
+      - data/cases_stage_1.csv
+      - data/cases_stage_2.csv
+      - data/cases_stage_3.csv
+      - data/cases_stage_4.csv
+    outs:
+      - data/case_summaries.jsonl
+
+  generate_rubrics:
+    cmd: python generate_rubrics.py
+    params:
+      - agent_definitions.yaml:
+        - rubric_generator
+    deps:
+      - generate_rubrics.py
+      - data/case_summaries.jsonl
+    outs:
+      - data/eval_dataset.jsonl
+
+  single_llm_zero_shot:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+        - gpt-5.5-2026-04-23
+        - anthropic/claude-opus-4-8
+    cmd: python run_inference.py --model ${item.model} --pipeline single_llm_zero_shot --save-steps 10
+    deps:
+      - experiments/single_llm_zero_shot.yaml
+      - pipelines/single_llm_zero_shot.py
+      - data/eval_dataset.jsonl
+
+
+  single_llm_with_web_search:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+        - gpt-5.5-2026-04-23
+    cmd: python run_inference.py --model ${item.model} --pipeline single_llm_with_web_search --save-steps 10
+    deps:
+      - experiments/single_llm_with_web_search.yaml
+      - pipelines/single_llm_with_web_search.py
+      - data/eval_dataset.jsonl
+
+
+  single_llm_with_pubmed_search:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+        - gpt-5.5-2026-04-23
+    cmd: python run_inference.py --model ${item.model} --pipeline single_llm_with_pubmed_search --save-steps 10
+    deps:
+      - experiments/single_llm_with_pubmed_search.yaml
+      - pipelines/single_llm_with_pubmed_search.py
+      - data/eval_dataset.jsonl
+  
+  
+  single_llm_with_pubmed_search_and_full_pmc_articles:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+    cmd: python run_inference.py --model ${item.model} --pipeline single_llm_with_pubmed_search_and_full_pmc_articles --save-steps 10
+    deps:
+      - experiments/single_llm_with_pubmed_search_and_full_pmc_articles.yaml
+      - pipelines/single_llm_with_pubmed_search_and_full_pmc_articles.py
+      - data/eval_dataset.jsonl
+  
+  
+  divide_and_conquer:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+    cmd: python run_inference.py --model ${item.model} --pipeline divide_and_conquer --save-steps 10
+    deps:
+      - experiments/divide_and_conquer.yaml
+      - pipelines/divide_and_conquer.py
+      - data/eval_dataset.jsonl
+  
+  
+  divide_and_conquer_with_fact_checker:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+    cmd: python run_inference.py --model ${item.model} --pipeline divide_and_conquer_with_fact_checker --save-steps 10
+    deps:
+      - experiments/divide_and_conquer_with_fact_checker.yaml
+      - pipelines/divide_and_conquer_with_fact_checker.py
+      - data/eval_dataset.jsonl
+  
+  
+  divide_and_conquer_with_subagents_auto_spawning:
+    matrix:
+      model:
+        - gemini/gemini-3.5-flash
+        - gemini/gemini-2.5-flash
+        - gemini/gemini-3.1-pro-preview
+        - gpt-5.5-2026-04-23
+        - anthropic/claude-opus-4-8
+    cmd: python run_inference.py --model ${item.model} --pipeline divide_and_conquer_with_subagents_auto_spawning --save-steps 10
+    deps:
+      - experiments/divide_and_conquer_with_subagents_auto_spawning.yaml
+      - pipelines/divide_and_conquer_with_subagents_auto_spawning.py
+      - data/eval_dataset.jsonl
