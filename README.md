@@ -1,7 +1,6 @@
 # Agentic systems for breast cancer treatment recommendations
 
-Source code and experiment configuration for the paper *"Agentic systems for breast
-cancer treatment recommendations"*.
+Source code and experiment configuration for the paper [*"Agentic systems for breast cancer treatment recommendations"*](https://arxiv.org/abs/2607.12051).
 
 The study benchmarks agentic LLM systems on the task of generating breast cancer
 treatment recommendations. It evaluates **seven pipelines** (single-LLM baselines,
@@ -164,4 +163,16 @@ corresponding `experiments/<pipeline>.yaml`.
 
 ## Citation
 
-Please cite the associated paper if you use this code. (Citation details to be added.)
+Please cite the associated paper if you use this code. 
+
+```
+@misc{dealmeida2026agenticsystemsbreastcancer,
+      title={Agentic systems for breast cancer treatment recommendations}, 
+      author={Vinicius Anjos de Almeida and Nícolas Henrique Borges and Leonardo Vicenzi and Helena Kociolek and Sarah Miriã de Castro Rocha and Frederico Nassif Gomes and Júlia Cristina Ferreira Ribeiro and Lucas Emanuel Silva e Oliveira},
+      year={2026},
+      eprint={2607.12051},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2607.12051}, 
+}
+```

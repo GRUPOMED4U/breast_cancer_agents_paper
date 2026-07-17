@@ -1,0 +1,54 @@
+cff-version: 1.2.0
+message: Please cite the following works when using this software.
+preferred-citation:
+  abstract: >-
+    Large language models (LLMs) are increasingly being explored for clinical
+    decision support, but their reliability in complex oncology treatment
+    planning remains unclear. We evaluated agentic LLM systems for breast cancer
+    treatment recommendation generation using 72 real clinical cases across
+    stages I to IV and 1,147 case-specific rubrics generated through Asymmetric
+    Information Rubric Generation (AIRG), in which the rubric generator had
+    access to real clinical decisions unavailable to the evaluated models. Seven
+    pipelines were compared, including single-LLM baselines, tool-augmented
+    systems, and multi-agent architectures with fact checking and autonomous
+    subagent spawning. The best-performing configuration, Claude Opus 4.8 with
+    the D&amp;C+SA pipeline, achieved a global score of 0.594 $\pm$ 0.025. Tool
+    use and increased agent autonomy had mixed effects, improving performance in
+    some settings but degrading it in others. Performance varied by clinical
+    domain and disease stage, and oncologist-led error analysis revealed
+    persistent clinically relevant failures, including incorrect or missing
+    recommendations, flawed justifications, citation errors, outdated claims,
+    and overconfidence. These findings suggest that agentic LLM systems can
+    generate clinically relevant breast cancer recommendations, but remain
+    insufficient for unsupervised clinical use.
+  authors:
+    - family-names: de Almeida
+      given-names: Vinicius Anjos
+    - family-names: Borges
+      given-names: Nícolas Henrique
+    - family-names: Vicenzi
+      given-names: Leonardo
+    - family-names: Kociolek
+      given-names: Helena
+    - family-names: Rocha
+      given-names: Sarah Miriã de Castro
+    - family-names: Gomes
+      given-names: Frederico Nassif
+    - family-names: Ribeiro
+      given-names: Júlia Cristina Ferreira
+    - family-names: Oliveira
+      given-names: Lucas Emanuel Silva e
+  doi: 10.48550/ARXIV.2607.12051
+  identifiers:
+    - type: doi
+      value: 10.48550/ARXIV.2607.12051
+    - type: url
+      value: https://arxiv.org/abs/2607.12051
+  title: Agentic systems for breast cancer treatment recommendations
+  url: https://arxiv.org/abs/2607.12051
+  version: '1'
+  date-published: 2026-01-01
+  year: 2026
+  publisher:
+    name: arXiv
+  type: article
