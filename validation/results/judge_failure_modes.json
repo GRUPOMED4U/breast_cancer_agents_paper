@@ -1,0 +1,133 @@
+{
+  "n_responses": 1944,
+  "n_verdicts": 30969,
+  "judge": [
+    "gemini-2.5-flash"
+  ],
+  "overall_met_rate": 0.3904549711001324,
+  "met_rate_by_within_case_length_quintile": {
+    "positive": {
+      "Q1": {
+        "n": 4962,
+        "met_rate": 0.4286577992744861,
+        "median_words": 484.0
+      },
+      "Q2": {
+        "n": 4135,
+        "met_rate": 0.4788391777509069,
+        "median_words": 610.0
+      },
+      "Q3": {
+        "n": 4962,
+        "met_rate": 0.49818621523579204,
+        "median_words": 766.5
+      },
+      "Q4": {
+        "n": 4135,
+        "met_rate": 0.5559854897218863,
+        "median_words": 1142.0
+      },
+      "Q5": {
+        "n": 4135,
+        "met_rate": 0.5966142684401451,
+        "median_words": 1706.0
+      }
+    },
+    "negative": {
+      "Q1": {
+        "n": 1920,
+        "met_rate": 0.08177083333333333,
+        "median_words": 479.0
+      },
+      "Q2": {
+        "n": 1600,
+        "met_rate": 0.085625,
+        "median_words": 605.0
+      },
+      "Q3": {
+        "n": 1920,
+        "met_rate": 0.09322916666666667,
+        "median_words": 757.0
+      },
+      "Q4": {
+        "n": 1600,
+        "met_rate": 0.0825,
+        "median_words": 1135.0
+      },
+      "Q5": {
+        "n": 1600,
+        "met_rate": 0.08875,
+        "median_words": 1698.0
+      }
+    }
+  },
+  "within_criterion_spearman_length_vs_met": {
+    "positive": {
+      "mean_rho": 0.22421369353892093,
+      "ci_low": 0.20015115922627327,
+      "ci_high": 0.24694666976026783,
+      "n_criteria_with_variation": 591
+    },
+    "negative": {
+      "mean_rho": 0.00509367799059918,
+      "ci_low": -0.02654799953265349,
+      "ci_high": 0.03689612160601993,
+      "n_criteria_with_variation": 172
+    }
+  },
+  "within_criterion_within_pipeline_spearman": {
+    "positive": {
+      "mean_rho": 0.3029696043241775,
+      "ci_low": 0.26602960522330404,
+      "ci_high": 0.33750519389119227,
+      "n_groups_with_variation": 2113
+    },
+    "negative": {
+      "mean_rho": 0.019078378599433614,
+      "ci_low": -0.052664440357907134,
+      "ci_high": 0.08649284865745277,
+      "n_groups_with_variation": 445
+    }
+  },
+  "within_case_spearman_length_vs_case_score": {
+    "mean_rho": 0.3526399367394094,
+    "ci_low": 0.29728559678510386,
+    "ci_high": 0.4059936670553855
+  },
+  "missing_info_exception": {
+    "positive": {
+      "met_verdicts": 11345,
+      "flagged": 1439,
+      "share": 0.12684001762891142
+    },
+    "negative": {
+      "met_verdicts": 747,
+      "flagged": 102,
+      "share": 0.13654618473895583
+    },
+    "by_category": {
+      "complementary_exams": {
+        "met_verdicts": 2955,
+        "flagged": 161,
+        "share": 0.0544839255499154
+      },
+      "radiotherapy": {
+        "met_verdicts": 2254,
+        "flagged": 366,
+        "share": 0.16237799467613132
+      },
+      "surgery": {
+        "met_verdicts": 2331,
+        "flagged": 413,
+        "share": 0.17717717717717718
+      },
+      "systemic_therapy": {
+        "met_verdicts": 4552,
+        "flagged": 601,
+        "share": 0.1320298769771529
+      }
+    },
+    "note": "Keyword flag over the judge's explanation; an upper bound on use of the exception. See the spot-check file."
+  },
+  "empty_explanations": 0
+}
