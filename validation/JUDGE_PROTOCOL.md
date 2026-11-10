@@ -59,7 +59,7 @@ Script: `validation/judge_failure_modes.py` → `validation/results/judge_failur
 
 ## C and D. Cross-provider judges and repeated grading
 
-D has been run; C has been run with GPT-5.4 mini, Claude Sonnet 5.5 is next (results below). `evals/` and `.env` are gitignored; when running from another checkout or worktree, set `BCA_DATA_ROOT` to the checkout that has them.
+D and C have been run (results below): D with Gemini 2.5 Flash repeats, C with GPT-5.4 mini and Claude Sonnet 5.5. `evals/` and `.env` are gitignored; when running from another checkout or worktree, set `BCA_DATA_ROOT` to the checkout that has them.
 
 - `validation/regrade.py --judge <backend>:<model> [--cases-per-stage N] [--repeats K] [--dry-run]` re-grades with byte-identical prompts, resumable, output in `validation/output/regrades/` (gitignored).
 - `validation/judge_agreement.py` → `validation/results/judge_agreement.json`:
@@ -136,13 +136,48 @@ Reading:
 
 Proposed text: "To test whether the results depend on the judge, we re-graded the same 24-case subset with a judge from another provider, GPT-5.4 mini (OpenAI; reasoning effort medium), which was not among the evaluated models. Criterion-level agreement with the original judge was κ = 0.81 (91.3% agreement), close to the original judge's agreement with itself (κ = 0.88). GPT-5.4 mini was stricter (met-rate 33.6% vs 39.9%), lowering absolute scores by 0.064 on average, but the configuration ranking was preserved (Kendall's τ = 0.87), with the same top three configurations and the same best (D&C+SA) and worst (zero-shot) pipelines. We found no evidence that the Gemini judge favored Gemini-generated responses."
 
-**Still to run for C:** Claude Sonnet 5.5 (`litellm:anthropic/claude-sonnet-5-5`) on the same subset, with its default adaptive reasoning. Est. $40–140 (to be measured on the first calls).
+### C results: cross-provider judge, Claude Sonnet 5.5 (run 10 Nov 2026)
+
+**Setup.** `claude-sonnet-5-5` (Anthropic API), provider defaults: adaptive reasoning, which is always on for this model, at its default effort; `max_tokens` 16,000. Same prompt text; for Anthropic it is sent as two consecutive text blocks split at `# Rubric`, so the shared prefix (instructions, case, response) can be cached (75% of input tokens were cache reads). Same 24 cases × 27 configurations, one pass. 10,179 calls, 0 failures, total cost $47.27. Claude wrote its explanations in Portuguese (Gemini in English); this does not affect the met / not met verdicts.
+
+| Measure | Sonnet 5.5 vs Gemini | GPT-5.4 mini vs Gemini | Sonnet 5.5 vs GPT-5.4 mini |
+|---|---|---|---|
+| % agreement, Cohen's κ | 92.1%, **0.83** (0.79–0.86) | 91.3%, 0.81 | 93.8%, **0.86** |
+| Gwet's AC1 | 0.85 | 0.84 | 0.89 |
+| Positive criteria: κ | 0.85 | 0.82 | |
+| Negative criteria: κ / AC1 | **0.28** / 0.89 | 0.51 / 0.90 | |
+| Met-rate, positive criteria | 47.3% vs 50.7% | 43.2% vs 50.7% | |
+| Met-rate, negative criteria | **3.5%** vs 10.6% | 7.7% vs 10.6% | |
+| Case score: Pearson r | 0.78 | 0.82 | |
+| Mean case score (Gemini 0.490) | 0.493 | 0.426 | |
+| Configuration ranking: Kendall's τ | 0.79 (largest rank change 7) | 0.87 (5) | 0.81 |
+| Self-preference (difference in differences) | 0.000 (−0.018 to 0.020) | −0.025 (−0.050 to −0.001) | |
+
+By category (κ vs Gemini): complementary exams 0.86, radiotherapy 0.86, systemic therapy 0.81, surgery 0.76.
+
+**Pipeline averages under each judge** (mean of the configuration scores in each pipeline, 24-case subset):
+
+| Judge | Order |
+|---|---|
+| Gemini 2.5 Flash (original) | D&C+SA 0.544 > D&C+FC 0.494 > D&C 0.487 > WS 0.486 > PM 0.481 > PM+PMC 0.466 > Zero-shot 0.460 |
+| GPT-5.4 mini | D&C+SA 0.469 > WS 0.426 > PM 0.424 > D&C 0.416 > D&C+FC 0.415 > PM+PMC 0.413 > Zero-shot 0.405 |
+| Claude Sonnet 5.5 | D&C+SA 0.537 > WS 0.489 > PM 0.487 > Zero-shot 0.486 > D&C+FC 0.484 > D&C 0.479 > PM+PMC 0.468 |
+
+Reading, across the three judges (and D):
+- **Criterion-level agreement is high for every pair of judges** (κ 0.81–0.86), and close to Gemini's agreement with itself (0.88). The two new judges agree with each other more (0.86) than either does with Gemini, so on the margin Gemini is the outlier, mainly by being more lenient on positive criteria.
+- **Negative criteria are where judges differ most.** Sonnet 5.5 marks a negative criterion as met in 3.5% of cases, Gemini in 10.6%, GPT-5.4 mini in 7.7%. Because negative criteria subtract points, Sonnet's stricter positives and more lenient negatives cancel out, so its mean score (0.493) matches Gemini's (0.490). Which judge is right on negative criteria cannot be settled from the judges alone: **this is the key question for the clinician labels (B)**, which should report judge–clinician agreement separately for negative criteria.
+- **Robust across all three judges:** D&C+SA is the best pipeline on average, by a clear margin (0.04–0.05 above the next pipeline under every judge), and the same three configurations make up the top 3 (D&C+FC with Gemini 3.5 Flash, D&C+SA with Gemini 3.5 Flash, D&C+SA with Claude Opus 4.8), although their order changes under Sonnet.
+- **Not robust:** the order of the other six pipelines. Under each judge they lie within ~0.02–0.03 of each other, and the order changes between judges. In particular, **zero-shot is the worst pipeline under Gemini and GPT, but fourth under Sonnet**. The paper should not claim that the tool-augmented single-LLM pipelines, D&C or D&C+FC beat zero-shot.
+- **No self-preference:** neither cross-judge comparison suggests the Gemini judge favors Gemini-generated responses (Sonnet: 0.000; GPT: −0.025).
+- **Surgery is the least reliable category** under every comparison (κ 0.71–0.80), as in D.
+
+Proposed text: "To test whether the results depend on the judge, we re-graded a stratified 24-case subset (all 27 configurations; 10,179 criterion judgments) with two judges from other providers that were not among the evaluated models, GPT-5.4 mini (OpenAI) and Claude Sonnet 5.5 (Anthropic), both with reasoning enabled. Criterion-level agreement with the original judge was κ = 0.81 and 0.83 (κ = 0.86 between the two new judges), close to the original judge's agreement with itself on repeated grading (κ = 0.88). Agreement was lowest on negative (penalty) criteria, where the judges differed in how often a penalty applied (3.5%–10.6%). Configuration rankings were largely preserved (Kendall's τ = 0.87 and 0.79). Under all judges, D&C+SA was the best pipeline and the same three configurations ranked highest, whereas the ordering of the remaining pipelines, including zero-shot, depended on the judge. We found no evidence that the Gemini judge favored Gemini-generated responses."
 
 ## Status vs "Done when" in #11
 - [x] Judge identity, settings and what the judge sees: confirmed from code and data (above)
 - [ ] Protocol text moved into Methods and the Supplement (draft above)
 - [x] D: judge stability (24-case subset, 3 gradings)
 - [x] C, GPT-5.4 mini (24-case subset)
-- [ ] C, Claude Sonnet 5.5
+- [x] C, Claude Sonnet 5.5 (24-case subset)
 - [ ] B: judge–clinician agreement (needs #14)
 - [ ] Response-to-reviewers text

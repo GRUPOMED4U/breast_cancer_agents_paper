@@ -154,9 +154,21 @@ class Judge:
         if self.openrouter_provider:
             # Serve only from this upstream provider, never fall back to another host.
             kwargs["extra_body"] = {"provider": {"order": [self.openrouter_provider], "allow_fallbacks": False}}
+        content = prompt
+        if "claude" in self.model:
+            # Anthropic caches only marked prefixes. Split the same prompt text at the
+            # rubric: block 1 (instructions + case + response) is shared by every
+            # criterion of a response and is cached; the concatenated text is unchanged.
+            kwargs["max_tokens"] = 16000  # room for adaptive thinking + the JSON verdict
+            head, sep, tail = prompt.partition("\n# Rubric\n")
+            if sep:
+                content = [
+                    {"type": "text", "text": head + "\n", "cache_control": {"type": "ephemeral"}},
+                    {"type": "text", "text": "# Rubric\n" + tail},
+                ]
         r = await self.litellm.acompletion(
             model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": content}],
             drop_params=True,
             **kwargs,
         )
