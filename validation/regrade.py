@@ -39,7 +39,7 @@ import re
 import sys
 from pathlib import Path
 
-from tqdm.asyncio import tqdm
+from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from data_models import EvaluationEntry, GraderResponse  # noqa: E402
@@ -49,7 +49,17 @@ from judge_common import EVALS_DIR, OUTPUT_DIR, SEED, ensure_output_dir, maybe_l
 
 
 CHARS_PER_TOKEN = 4.0  # calibrated on the original grading (78.0M prompt tokens for 30,969 calls)
-MAX_ATTEMPTS = 4
+MAX_ATTEMPTS = 6
+# Errors that mean "no more credit / bad key": stop the run instead of retrying.
+FATAL_PATTERNS = re.compile(
+    r"insufficient_quota|exceeded your current quota|insufficient credits|credit balance|"
+    r"payment required|\b402\b|billing|invalid api key|incorrect api key|AuthenticationError",
+    re.IGNORECASE,
+)
+
+
+class CreditsExhausted(Exception):
+    pass
 JSON_OBJ = re.compile(r"\{.*\}", re.DOTALL)
 
 
@@ -94,9 +104,10 @@ def parse_verdict(text: str) -> GraderResponse:
 
 
 class Judge:
-    def __init__(self, spec: str, temperature: float | None, seed: int | None):
+    def __init__(self, spec: str, temperature: float | None, seed: int | None, reasoning_effort: str | None = None):
         self.backend, self.model = spec.split(":", 1)
         self.temperature, self.seed = temperature, seed
+        self.reasoning_effort = reasoning_effort
         if self.backend == "gemini":
             from google import genai
 
@@ -109,7 +120,7 @@ class Judge:
         else:
             raise SystemExit(f"Unknown backend '{self.backend}' (use gemini: or litellm:)")
 
-    async def grade(self, prompt: str) -> dict:
+    async def grade(self, prompt: str, cache_key: str | None = None) -> dict:
         if self.backend == "gemini":
             config = {
                 "response_mime_type": "application/json",
@@ -123,6 +134,11 @@ class Judge:
             usage = r.usage_metadata.model_dump(exclude_none=True) if r.usage_metadata else {}
             return {"text": r.text, "model_version": r.model_version, "usage": usage}
         kwargs = {}
+        if self.reasoning_effort is not None:
+            kwargs["reasoning_effort"] = self.reasoning_effort
+        if cache_key is not None and "gpt" in self.model:
+            # Routes requests that share a prefix to the same cache (OpenAI).
+            kwargs["prompt_cache_key"] = cache_key
         if self.temperature is not None:
             kwargs["temperature"] = self.temperature
         if self.seed is not None:
@@ -134,10 +150,13 @@ class Judge:
             **kwargs,
         )
         usage = r.usage.model_dump() if getattr(r, "usage", None) else {}
-        return {"text": r.choices[0].message.content, "model_version": r.model, "usage": usage}
+        cost = (getattr(r, "_hidden_params", None) or {}).get("response_cost")
+        return {"text": r.choices[0].message.content, "model_version": r.model, "usage": usage, "cost": cost}
 
 
-async def run_rep(judge: Judge, jobs: list[dict], out_path: Path, concurrency: int) -> None:
+async def run_rep(judge: Judge, jobs: list[dict], out_path: Path, concurrency: int) -> bool:
+    """Grade the jobs not yet in ``out_path``. Returns False if the run was
+    stopped because the provider reported exhausted credits or a bad key."""
     done = set()
     if out_path.exists():
         with open(out_path, encoding="utf-8") as f:
@@ -148,38 +167,75 @@ async def run_rep(judge: Judge, jobs: list[dict], out_path: Path, concurrency: i
     todo = [j for j in jobs if (j["prompt_id"], j["config"], j["criterion_idx"]) not in done]
     print(f"{out_path}: {len(done)} done, {len(todo)} to grade")
     if not todo:
-        return
+        return True
 
-    sem = asyncio.Semaphore(concurrency)
+    # Group by response. Within a response, grade one criterion first and the
+    # rest after it, so the shared prefix (case summary + response) is cached
+    # by providers with automatic prompt caching.
+    by_response = collections.defaultdict(list)
+    for j in todo:
+        by_response[(j["prompt_id"], j["config"])].append(j)
+
+    call_sem = asyncio.Semaphore(concurrency)
+    response_sem = asyncio.Semaphore(max(2, concurrency // 4))
+    stop = asyncio.Event()
     lock = asyncio.Lock()
+    stats = collections.Counter()
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    bar = tqdm(total=len(todo), desc=out_path.parent.name + "/" + out_path.stem)
 
     with open(out_path, "a", encoding="utf-8") as f:
 
         async def one(job):
+            if stop.is_set():
+                return
             rec = {k: job[k] for k in ("prompt_id", "config", "criterion_idx")}
-            rec.update(criteria_met=None, explanation="", model_version=None, usage={}, error=None)
-            async with sem:
+            rec.update(judge=f"{judge.backend}:{judge.model}", criteria_met=None, explanation="",
+                       model_version=None, usage={}, cost=None, error=None)
+            async with call_sem:
                 for attempt in range(MAX_ATTEMPTS):
+                    if stop.is_set():
+                        return
                     try:
-                        raw = await judge.grade(job["prompt"])
+                        raw = await judge.grade(job["prompt"], cache_key=f"{job['prompt_id']}|{job['config']}")
                         verdict = parse_verdict(raw["text"])
                         rec.update(
                             criteria_met=verdict.criteria_met,
                             explanation=verdict.explanation,
                             model_version=raw["model_version"],
                             usage=raw["usage"],
+                            cost=raw.get("cost"),
                             error=None,
                         )
                         break
                     except Exception as e:  # network, rate limit or unparseable output
-                        rec["error"] = f"{type(e).__name__}: {e}"[:500]
-                        await asyncio.sleep(2 ** attempt * 5)
+                        msg = f"{type(e).__name__}: {e}"
+                        rec["error"] = msg[:500]
+                        if FATAL_PATTERNS.search(msg):
+                            if not stop.is_set():
+                                print(f"\nStopping: provider reports exhausted credits or a bad key: {msg[:300]}")
+                            stop.set()
+                            return
+                        await asyncio.sleep(min(60, 5 * 2**attempt))
             async with lock:
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 f.flush()
+                stats["written"] += 1
+                stats["failed"] += rec["criteria_met"] is None
+                stats["cost"] += rec["cost"] or 0
+                bar.update(1)
 
-        await tqdm.gather(*(one(j) for j in todo), desc=out_path.parent.name + "/" + out_path.stem)
+        async def response(js):
+            async with response_sem:
+                if stop.is_set():
+                    return
+                await one(js[0])
+                await asyncio.gather(*(one(j) for j in js[1:]))
+
+        await asyncio.gather(*(response(js) for js in by_response.values()))
+    bar.close()
+    print(f"Written {stats['written']} verdicts ({stats['failed']} failed), reported cost ${stats['cost']:.2f}")
+    return not stop.is_set()
 
 
 def main() -> None:
@@ -191,7 +247,14 @@ def main() -> None:
     p.add_argument("--configs", nargs="*", default=None, help="Restrict to these pipeline::model configurations.")
     p.add_argument("--temperature", type=float, default=None, help="Default: provider default, as in the original grading.")
     p.add_argument("--seed", type=int, default=None)
+    p.add_argument("--reasoning-effort", default=None, help="e.g. low / medium / high (LiteLLM judges). Default: provider default.")
     p.add_argument("--concurrency", type=int, default=16)
+    p.add_argument(
+        "--slug",
+        default=None,
+        help="Output folder name (default: from the model id). Use the same slug to continue a "
+        "judge through another provider, e.g. OpenRouter.",
+    )
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
 
@@ -219,19 +282,27 @@ def main() -> None:
     if args.dry_run:
         return
 
-    judge = Judge(args.judge, args.temperature, args.seed)
-    out_dir = ensure_output_dir() / "regrades" / judge_slug(args.judge)
-    meta = {
+    judge = Judge(args.judge, args.temperature, args.seed, args.reasoning_effort)
+    out_dir = ensure_output_dir() / "regrades" / (args.slug or judge_slug(args.judge))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    meta_path = out_dir / "meta.json"
+    meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
+    run = {
         "judge": args.judge,
         "temperature": args.temperature,
         "seed": args.seed,
+        "reasoning_effort": args.reasoning_effort,
         "cases": sorted(cases, key=int) if cases is not None else "all",
         "configs": args.configs or "all",
     }
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    # Top-level keys describe the first run; later runs (e.g. another provider) are listed in "runs".
+    for k, v in run.items():
+        meta.setdefault(k, v)
+    meta.setdefault("runs", []).append(run)
+    meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
     for k in range(args.first_rep, args.first_rep + args.repeats):
-        asyncio.run(run_rep(judge, jobs, out_dir / f"rep{k}.jsonl", args.concurrency))
+        if not asyncio.run(run_rep(judge, jobs, out_dir / f"rep{k}.jsonl", args.concurrency)):
+            raise SystemExit(2)
 
 
 if __name__ == "__main__":
