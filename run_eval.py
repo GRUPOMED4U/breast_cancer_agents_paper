@@ -48,6 +48,27 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--grader-temperature",
+        type=float,
+        default=None,
+        help="Grader sampling temperature. Default: provider default (as in the paper).",
+    )
+
+    parser.add_argument(
+        "--grader-seed",
+        type=int,
+        default=None,
+        help="Grader sampling seed. Default: none (as in the paper).",
+    )
+
+    parser.add_argument(
+        "--grader-thinking-budget",
+        type=int,
+        default=None,
+        help="Grader thinking budget in tokens (0 disables thinking on Flash). Default: provider default.",
+    )
+
+    parser.add_argument(
         "--eval-dataset",
         type=Path,
         default=Path("data/eval_dataset.jsonl"),
@@ -78,10 +99,23 @@ async def run_single_eval(
     eval_dataset_path: Path | None,
     results_base_path: Path,
     evals_base_path: Path,
+    grader_settings: dict | None = None,
 ) -> None:
     logger.info(f"Running {pipeline_id} on {model_id}...")
 
-    evaluator = AsyncGeminiEvaluator(model_id=grader_model_id)
+    grader_settings = grader_settings or {}
+    generation_config = {
+        k: v
+        for k, v in grader_settings.items()
+        if k in ("temperature", "seed") and v is not None
+    }
+    if grader_settings.get("thinking_budget") is not None:
+        generation_config["thinking_config"] = {
+            "thinking_budget": grader_settings["thinking_budget"]
+        }
+    evaluator = AsyncGeminiEvaluator(
+        model_id=grader_model_id, generation_config=generation_config
+    )
 
     dataset_path = results_base_path / pipeline_id / f"{model_id}.jsonl"
 
@@ -100,6 +134,15 @@ async def run_single_eval(
 
     metrics.model_id = model_id
     metrics.eval_model_id = grader_model_id
+    # Explicit settings (None = provider default) and the served model versions.
+    metrics.grader_settings = grader_settings
+    metrics.grader_model_versions = sorted(
+        {
+            v
+            for e in metrics.per_example_details
+            for v in getattr(e, "grader_model_versions", None) or []
+        }
+    )
     metrics.pipeline_id = pipeline_id
 
     output_path = evals_base_path / pipeline_id / f"{model_id}.json"
@@ -125,6 +168,11 @@ async def main() -> None:
         eval_dataset_path=args.eval_dataset,
         results_base_path=args.results_dir,
         evals_base_path=args.evals_dir,
+        grader_settings={
+            "temperature": args.grader_temperature,
+            "seed": args.grader_seed,
+            "thinking_budget": args.grader_thinking_budget,
+        },
     )
 
 

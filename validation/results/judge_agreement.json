@@ -1,0 +1,1413 @@
+{
+  "original_judge": "gemini-2.5-flash (evals/)",
+  "failures": {
+    "claude-sonnet-5-5/rep1": 0,
+    "gemini-2.5-flash/rep1": 0,
+    "gemini-2.5-flash/rep2": 0,
+    "gpt-5.4-mini/rep1": 0
+  },
+  "judges": {
+    "claude-sonnet-5-5": {
+      "meta": {
+        "judge": "litellm:anthropic/claude-sonnet-5-5",
+        "temperature": null,
+        "seed": null,
+        "reasoning_effort": null,
+        "openrouter_provider": null,
+        "cases": [
+          "3",
+          "9",
+          "10",
+          "14",
+          "15",
+          "17",
+          "27",
+          "30",
+          "31",
+          "32",
+          "33",
+          "35",
+          "36",
+          "37",
+          "43",
+          "45",
+          "49",
+          "50",
+          "54",
+          "57",
+          "63",
+          "64",
+          "67",
+          "68"
+        ],
+        "configs": "all",
+        "runs": [
+          {
+            "judge": "litellm:anthropic/claude-sonnet-5-5",
+            "temperature": null,
+            "seed": null,
+            "reasoning_effort": null,
+            "openrouter_provider": null,
+            "cases": [
+              "3",
+              "9",
+              "10",
+              "14",
+              "15",
+              "17",
+              "27",
+              "30",
+              "31",
+              "32",
+              "33",
+              "35",
+              "36",
+              "37",
+              "43",
+              "45",
+              "49",
+              "50",
+              "54",
+              "57",
+              "63",
+              "64",
+              "67",
+              "68"
+            ],
+            "configs": "all"
+          }
+        ]
+      },
+      "cross_judge_vs_original": {
+        "compared_label": "claude-sonnet-5-5/rep1",
+        "criterion_level": {
+          "overall": {
+            "n": 10179,
+            "pct_agreement": 0.9199331957952648,
+            "cohen_kappa": 0.8298485054365243,
+            "gwet_ac1": 0.8490451568949058,
+            "met_rate_a": 0.3986639159052952,
+            "met_rate_b": 0.3547499754396306,
+            "a_met_b_not": 631,
+            "a_not_b_met": 184,
+            "cohen_kappa_ci": [
+              0.7922659883000017,
+              0.8610489227847501
+            ]
+          },
+          "positive": {
+            "n": 7425,
+            "pct_agreement": 0.9259259259259259,
+            "cohen_kappa": 0.8519674598467966,
+            "gwet_ac1": 0.8519067824499663,
+            "met_rate_a": 0.5073400673400673,
+            "met_rate_b": 0.4734006734006734,
+            "a_met_b_not": 401,
+            "a_not_b_met": 149
+          },
+          "negative": {
+            "n": 2754,
+            "pct_agreement": 0.9037763253449528,
+            "cohen_kappa": 0.2773628958953428,
+            "gwet_ac1": 0.8893154387150273,
+            "met_rate_a": 0.1056644880174292,
+            "met_rate_b": 0.034858387799564274,
+            "a_met_b_not": 230,
+            "a_not_b_met": 35
+          },
+          "by_category": {
+            "complementary_exams": {
+              "n": 3267,
+              "pct_agreement": 0.9400061218243037,
+              "cohen_kappa": 0.8579040080029576,
+              "gwet_ac1": 0.8961748093403952,
+              "met_rate_a": 0.30731558004285275,
+              "met_rate_b": 0.29813284358738906,
+              "a_met_b_not": 113,
+              "a_not_b_met": 83
+            },
+            "radiotherapy": {
+              "n": 1593,
+              "pct_agreement": 0.9322033898305084,
+              "cohen_kappa": 0.8641630636975464,
+              "gwet_ac1": 0.8648673485978466,
+              "met_rate_a": 0.4908976773383553,
+              "met_rate_b": 0.450721908349027,
+              "a_met_b_not": 86,
+              "a_not_b_met": 22
+            },
+            "surgery": {
+              "n": 1431,
+              "pct_agreement": 0.8763102725366876,
+              "cohen_kappa": 0.755494417978309,
+              "gwet_ac1": 0.7529221889310677,
+              "met_rate_a": 0.5394828791055206,
+              "met_rate_b": 0.42557651991614254,
+              "a_met_b_not": 170,
+              "a_not_b_met": 7
+            },
+            "systemic_therapy": {
+              "n": 3888,
+              "pct_agreement": 0.9140946502057613,
+              "cohen_kappa": 0.8143616838782722,
+              "gwet_ac1": 0.8404543675302366,
+              "met_rate_a": 0.38580246913580246,
+              "met_rate_b": 0.3369341563786008,
+              "a_met_b_not": 262,
+              "a_not_b_met": 72
+            }
+          }
+        },
+        "case_level": {
+          "n_responses": 648,
+          "pearson_r": 0.7831072546068891,
+          "spearman_rho": 0.769760885400811,
+          "mean_score_original": 0.4902539642382992,
+          "mean_score_other": 0.49321536025610385
+        },
+        "configuration_level": {
+          "n_configs": 27,
+          "kendall_tau": 0.794871794871795,
+          "kendall_tau_ci": [
+            0.6695156695156697,
+            0.851851851851852
+          ],
+          "per_config": {
+            "divide_and_conquer::gemini-gemini-2.5-flash": {
+              "original": 0.43062138895201646,
+              "other": 0.4094904343260067,
+              "delta": -0.02113095462600978,
+              "delta_ci": [
+                -0.07682596689556911,
+                0.03766919527394194
+              ]
+            },
+            "divide_and_conquer::gemini-gemini-3.1-pro-preview": {
+              "original": 0.4873893762760561,
+              "other": 0.49688580332591137,
+              "delta": 0.00949642704985526,
+              "delta_ci": [
+                -0.054755564833150534,
+                0.0817241883262922
+              ]
+            },
+            "divide_and_conquer::gemini-gemini-3.5-flash": {
+              "original": 0.5441265729334841,
+              "other": 0.5315145658042453,
+              "delta": -0.012612007129238823,
+              "delta_ci": [
+                -0.04693636908527183,
+                0.020505639491167512
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-2.5-flash": {
+              "original": 0.3658100727793266,
+              "other": 0.34622470623485607,
+              "delta": -0.019585366544470517,
+              "delta_ci": [
+                -0.06077995552397689,
+                0.022685641388676694
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-3.1-pro-preview": {
+              "original": 0.46451523665163563,
+              "other": 0.5084600293729487,
+              "delta": 0.04394479272131302,
+              "delta_ci": [
+                -0.005172167211002943,
+                0.09342049453844874
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-3.5-flash": {
+              "original": 0.6514603208258395,
+              "other": 0.5977057053152844,
+              "delta": -0.05375461551055505,
+              "delta_ci": [
+                -0.11231113097558454,
+                -0.0017931569866137837
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::anthropic-claude-opus-4-8": {
+              "original": 0.5856314422263512,
+              "other": 0.598181143531511,
+              "delta": 0.012549701305159755,
+              "delta_ci": [
+                -0.04089258051682502,
+                0.06937916899655608
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-2.5-flash": {
+              "original": 0.41016980282524496,
+              "other": 0.410341403082743,
+              "delta": 0.00017160025749801688,
+              "delta_ci": [
+                -0.05557637199671609,
+                0.06330190510596596
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.1-pro-preview": {
+              "original": 0.5436513464744355,
+              "other": 0.5206990848780054,
+              "delta": -0.022952261596430046,
+              "delta_ci": [
+                -0.0743092799132764,
+                0.0377891875922986
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.5-flash": {
+              "original": 0.5982531051880723,
+              "other": 0.5880877648818911,
+              "delta": -0.010165340306181214,
+              "delta_ci": [
+                -0.060528716767897305,
+                0.043377749481945865
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gpt-5.5-2026-04-23": {
+              "original": 0.5845933995191112,
+              "other": 0.5667876722749846,
+              "delta": -0.017805727244126546,
+              "delta_ci": [
+                -0.07037501081108323,
+                0.042919205321377066
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-2.5-flash": {
+              "original": 0.30931076105859096,
+              "other": 0.3307983075963658,
+              "delta": 0.02148754653777485,
+              "delta_ci": [
+                -0.027537995748194346,
+                0.07487267961744692
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-3.1-pro-preview": {
+              "original": 0.4848793042405779,
+              "other": 0.48777759429301665,
+              "delta": 0.0028982900524387456,
+              "delta_ci": [
+                -0.04673135267955357,
+                0.05323371012685381
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-3.5-flash": {
+              "original": 0.5611281425558278,
+              "other": 0.5769418829433391,
+              "delta": 0.015813740387511377,
+              "delta_ci": [
+                -0.03773728736161271,
+                0.07519696882137039
+              ]
+            },
+            "single_llm_with_pubmed_search::gpt-5.5-2026-04-23": {
+              "original": 0.569371592228228,
+              "other": 0.5530539153075612,
+              "delta": -0.016317676920666768,
+              "delta_ci": [
+                -0.06595717540409765,
+                0.0421179742473614
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-2.5-flash": {
+              "original": 0.3528768402049926,
+              "other": 0.35278912470263996,
+              "delta": -8.771550235264769e-05,
+              "delta_ci": [
+                -0.062843526036171,
+                0.06519640474677611
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.1-pro-preview": {
+              "original": 0.48833477175205936,
+              "other": 0.50203091164616,
+              "delta": 0.013696139894100623,
+              "delta_ci": [
+                -0.053804986329295805,
+                0.09017778615020512
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.5-flash": {
+              "original": 0.5573453679724202,
+              "other": 0.5504685112874919,
+              "delta": -0.006876856684928323,
+              "delta_ci": [
+                -0.04909217922756763,
+                0.03524675104252762
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-2.5-flash": {
+              "original": 0.3708241221338568,
+              "other": 0.350086935643384,
+              "delta": -0.020737186490472792,
+              "delta_ci": [
+                -0.07267755740982401,
+                0.03767212484496519
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-3.1-pro-preview": {
+              "original": 0.46913156613832546,
+              "other": 0.5035232327993004,
+              "delta": 0.034391666660974984,
+              "delta_ci": [
+                -0.02691232225765325,
+                0.10314548424333397
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-3.5-flash": {
+              "original": 0.5694323903083536,
+              "other": 0.5744512881681886,
+              "delta": 0.005018897859835003,
+              "delta_ci": [
+                -0.032010100091077166,
+                0.04172118639088041
+              ]
+            },
+            "single_llm_with_web_search::gpt-5.5-2026-04-23": {
+              "original": 0.5356263378508063,
+              "other": 0.52941901627571,
+              "delta": -0.006207321575096292,
+              "delta_ci": [
+                -0.05554549079267323,
+                0.04713335613952644
+              ]
+            },
+            "single_llm_zero_shot::anthropic-claude-opus-4-8": {
+              "original": 0.47629056034259126,
+              "other": 0.5092788965022512,
+              "delta": 0.03298833615965996,
+              "delta_ci": [
+                -0.006603594452245807,
+                0.08029922287347885
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-2.5-flash": {
+              "original": 0.36642118780361804,
+              "other": 0.41637736326341906,
+              "delta": 0.04995617545980102,
+              "delta_ci": [
+                0.002676061885402542,
+                0.10345159049240295
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-3.1-pro-preview": {
+              "original": 0.489848481793103,
+              "other": 0.482670136325607,
+              "delta": -0.007178345467495961,
+              "delta_ci": [
+                -0.05728384169455749,
+                0.045842043125928905
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-3.5-flash": {
+              "original": 0.4902757203666675,
+              "other": 0.5311400045465327,
+              "delta": 0.04086428417986515,
+              "delta_ci": [
+                -0.013593012362650031,
+                0.0978028278382474
+              ]
+            },
+            "single_llm_zero_shot::gpt-5.5-2026-04-23": {
+              "original": 0.47953782303248677,
+              "other": 0.4916292925854487,
+              "delta": 0.01209146955296192,
+              "delta_ci": [
+                -0.02652005450380702,
+                0.05279281368626117
+              ]
+            }
+          }
+        },
+        "self_preference": {
+          "gemini_minus_other_original": -0.06204157923638132,
+          "gemini_minus_other_other_judge": -0.06194095177303788,
+          "difference_in_differences": -0.00010062746334343897,
+          "ci": [
+            -0.01821889125445459,
+            0.019561720650318675
+          ],
+          "note": "Positive = the original (Gemini) judge favors Gemini-generated responses more than this judge does."
+        }
+      },
+      "stability": null
+    },
+    "gemini-2.5-flash": {
+      "meta": {
+        "judge": "gemini:gemini-2.5-flash",
+        "temperature": null,
+        "seed": null,
+        "cases": [
+          "3",
+          "9",
+          "10",
+          "14",
+          "15",
+          "17",
+          "27",
+          "30",
+          "31",
+          "32",
+          "33",
+          "35",
+          "36",
+          "37",
+          "43",
+          "45",
+          "49",
+          "50",
+          "54",
+          "57",
+          "63",
+          "64",
+          "67",
+          "68"
+        ],
+        "configs": "all"
+      },
+      "cross_judge_vs_original": {
+        "compared_label": "gemini-2.5-flash/rep1",
+        "criterion_level": {
+          "overall": {
+            "n": 10179,
+            "pct_agreement": 0.9421357697219767,
+            "cohen_kappa": 0.8792992134961279,
+            "gwet_ac1": 0.8888504090321433,
+            "met_rate_a": 0.3986639159052952,
+            "met_rate_b": 0.39836919147263977,
+            "a_met_b_not": 296,
+            "a_not_b_met": 293,
+            "cohen_kappa_ci": [
+              0.8501825475533287,
+              0.9037763037211889
+            ]
+          },
+          "positive": {
+            "n": 7425,
+            "pct_agreement": 0.9532659932659933,
+            "cohen_kappa": 0.9065062925885388,
+            "gwet_ac1": 0.9065580476089281,
+            "met_rate_a": 0.5073400673400673,
+            "met_rate_b": 0.5093602693602693,
+            "a_met_b_not": 166,
+            "a_not_b_met": 181
+          },
+          "negative": {
+            "n": 2754,
+            "pct_agreement": 0.9121278140885984,
+            "cohen_kappa": 0.522029303556445,
+            "gwet_ac1": 0.8923368594906749,
+            "met_rate_a": 0.1056644880174292,
+            "met_rate_b": 0.09912854030501089,
+            "a_met_b_not": 130,
+            "a_not_b_met": 112
+          },
+          "by_category": {
+            "complementary_exams": {
+              "n": 3267,
+              "pct_agreement": 0.9617385981022345,
+              "cohen_kappa": 0.910601408705075,
+              "gwet_ac1": 0.9331129780968448,
+              "met_rate_a": 0.30731558004285275,
+              "met_rate_b": 0.31313131313131315,
+              "a_met_b_not": 53,
+              "a_not_b_met": 72
+            },
+            "radiotherapy": {
+              "n": 1593,
+              "pct_agreement": 0.9491525423728814,
+              "cohen_kappa": 0.8982922993855746,
+              "gwet_ac1": 0.8983211120037478,
+              "met_rate_a": 0.4908976773383553,
+              "met_rate_b": 0.4965473948524796,
+              "a_met_b_not": 36,
+              "a_not_b_met": 45
+            },
+            "surgery": {
+              "n": 1431,
+              "pct_agreement": 0.9014675052410901,
+              "cohen_kappa": 0.8018525229134812,
+              "gwet_ac1": 0.8040103992380756,
+              "met_rate_a": 0.5394828791055206,
+              "met_rate_b": 0.5345911949685535,
+              "a_met_b_not": 74,
+              "a_not_b_met": 67
+            },
+            "systemic_therapy": {
+              "n": 3888,
+              "pct_agreement": 0.9377572016460906,
+              "cohen_kappa": 0.868271440667715,
+              "gwet_ac1": 0.8820066454781854,
+              "met_rate_a": 0.38580246913580246,
+              "met_rate_b": 0.37962962962962965,
+              "a_met_b_not": 133,
+              "a_not_b_met": 109
+            }
+          }
+        },
+        "case_level": {
+          "n_responses": 648,
+          "pearson_r": 0.8594760961100397,
+          "spearman_rho": 0.849224082011537,
+          "mean_score_original": 0.4902539642382992,
+          "mean_score_other": 0.4940435746794844
+        },
+        "configuration_level": {
+          "n_configs": 27,
+          "kendall_tau": 0.851851851851852,
+          "kendall_tau_ci": [
+            0.6752136752136754,
+            0.8632478632478634
+          ],
+          "per_config": {
+            "divide_and_conquer::gemini-gemini-2.5-flash": {
+              "original": 0.43062138895201646,
+              "other": 0.43416553044687006,
+              "delta": 0.003544141494853603,
+              "delta_ci": [
+                -0.044112317615854935,
+                0.05655649078505613
+              ]
+            },
+            "divide_and_conquer::gemini-gemini-3.1-pro-preview": {
+              "original": 0.4873893762760561,
+              "other": 0.5196368198270419,
+              "delta": 0.0322474435509858,
+              "delta_ci": [
+                -0.0072728156822229224,
+                0.0747432811412541
+              ]
+            },
+            "divide_and_conquer::gemini-gemini-3.5-flash": {
+              "original": 0.5441265729334841,
+              "other": 0.5367735249609021,
+              "delta": -0.007353047972581961,
+              "delta_ci": [
+                -0.03718575537749944,
+                0.01949451410658313
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-2.5-flash": {
+              "original": 0.3658100727793266,
+              "other": 0.3115649077184699,
+              "delta": -0.05424516506085669,
+              "delta_ci": [
+                -0.11364065026231192,
+                0.00646693701876548
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-3.1-pro-preview": {
+              "original": 0.46451523665163563,
+              "other": 0.4945921187956477,
+              "delta": 0.03007688214401205,
+              "delta_ci": [
+                -0.009460985775984705,
+                0.07120534691975501
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-3.5-flash": {
+              "original": 0.6514603208258395,
+              "other": 0.6129122495432991,
+              "delta": -0.03854807128254034,
+              "delta_ci": [
+                -0.07945338109557532,
+                0.00010571331297135673
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::anthropic-claude-opus-4-8": {
+              "original": 0.5856314422263512,
+              "other": 0.583016126377726,
+              "delta": -0.002615315848625177,
+              "delta_ci": [
+                -0.05440771594018994,
+                0.04286854062561086
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-2.5-flash": {
+              "original": 0.41016980282524496,
+              "other": 0.4231458089823031,
+              "delta": 0.012976006157058129,
+              "delta_ci": [
+                -0.02537821629220634,
+                0.05230570466590705
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.1-pro-preview": {
+              "original": 0.5436513464744355,
+              "other": 0.5134316179078962,
+              "delta": -0.030219728566539317,
+              "delta_ci": [
+                -0.05816845169916298,
+                -0.00318096542019046
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.5-flash": {
+              "original": 0.5982531051880723,
+              "other": 0.5951093903807781,
+              "delta": -0.00314371480729414,
+              "delta_ci": [
+                -0.0465485991923683,
+                0.04023067575551651
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gpt-5.5-2026-04-23": {
+              "original": 0.5845933995191112,
+              "other": 0.5829359999533084,
+              "delta": -0.0016573995658027973,
+              "delta_ci": [
+                -0.042480305476020164,
+                0.03972796083079212
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-2.5-flash": {
+              "original": 0.30931076105859096,
+              "other": 0.3273451695255156,
+              "delta": 0.018034408466924667,
+              "delta_ci": [
+                -0.028707284188669753,
+                0.06792455486102655
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-3.1-pro-preview": {
+              "original": 0.4848793042405779,
+              "other": 0.4887788963861078,
+              "delta": 0.003899592145529873,
+              "delta_ci": [
+                -0.039273809962706956,
+                0.045472147309702296
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-3.5-flash": {
+              "original": 0.5611281425558278,
+              "other": 0.5560741108563683,
+              "delta": -0.005054031699459505,
+              "delta_ci": [
+                -0.04693359795037166,
+                0.03910161556533738
+              ]
+            },
+            "single_llm_with_pubmed_search::gpt-5.5-2026-04-23": {
+              "original": 0.569371592228228,
+              "other": 0.5410295192208484,
+              "delta": -0.028342073007379565,
+              "delta_ci": [
+                -0.0798579129523757,
+                0.02312173177895463
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-2.5-flash": {
+              "original": 0.3528768402049926,
+              "other": 0.36659601946786174,
+              "delta": 0.013719179262869141,
+              "delta_ci": [
+                -0.02420987763156517,
+                0.05216858609466863
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.1-pro-preview": {
+              "original": 0.48833477175205936,
+              "other": 0.4933129157462195,
+              "delta": 0.0049781439941601335,
+              "delta_ci": [
+                -0.04076471697894516,
+                0.04806236250486661
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.5-flash": {
+              "original": 0.5573453679724202,
+              "other": 0.5918652952268474,
+              "delta": 0.03451992725442721,
+              "delta_ci": [
+                -0.0028650026086707997,
+                0.07087976195643718
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-2.5-flash": {
+              "original": 0.3708241221338568,
+              "other": 0.38241354792493726,
+              "delta": 0.011589425791080465,
+              "delta_ci": [
+                -0.033246135571722485,
+                0.05145532160453255
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-3.1-pro-preview": {
+              "original": 0.46913156613832546,
+              "other": 0.49323626000386916,
+              "delta": 0.024104693865543703,
+              "delta_ci": [
+                -0.018273049906427197,
+                0.06776719229416119
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-3.5-flash": {
+              "original": 0.5694323903083536,
+              "other": 0.5783313657980161,
+              "delta": 0.008898975489662564,
+              "delta_ci": [
+                -0.03918086640881797,
+                0.05738700670387118
+              ]
+            },
+            "single_llm_with_web_search::gpt-5.5-2026-04-23": {
+              "original": 0.5356263378508063,
+              "other": 0.5554246024995516,
+              "delta": 0.019798264648745345,
+              "delta_ci": [
+                -0.0422801344276743,
+                0.06952981647371864
+              ]
+            },
+            "single_llm_zero_shot::anthropic-claude-opus-4-8": {
+              "original": 0.47629056034259126,
+              "other": 0.5075980478961745,
+              "delta": 0.0313074875535832,
+              "delta_ci": [
+                -0.007663807961940134,
+                0.0737108208737824
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-2.5-flash": {
+              "original": 0.36642118780361804,
+              "other": 0.3770434632866184,
+              "delta": 0.010622275483000376,
+              "delta_ci": [
+                -0.03383846635471697,
+                0.05233086227156025
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-3.1-pro-preview": {
+              "original": 0.489848481793103,
+              "other": 0.4958163910712019,
+              "delta": 0.005967909278098926,
+              "delta_ci": [
+                -0.028472056561111812,
+                0.039974862289586924
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-3.5-flash": {
+              "original": 0.4902757203666675,
+              "other": 0.5024289303852991,
+              "delta": 0.012153210018631622,
+              "delta_ci": [
+                -0.024706237975494608,
+                0.05044198497456125
+              ]
+            },
+            "single_llm_zero_shot::gpt-5.5-2026-04-23": {
+              "original": 0.47953782303248677,
+              "other": 0.4745978861563997,
+              "delta": -0.00493993687608707,
+              "delta_ci": [
+                -0.05341357963708699,
+                0.04297585176127452
+              ]
+            }
+          }
+        },
+        "self_preference": {
+          "gemini_minus_other_original": -0.06204157923638132,
+          "gemini_minus_other_other_judge": -0.0600730144343789,
+          "difference_in_differences": -0.001968564802002415,
+          "ci": [
+            -0.02424979043708473,
+            0.019143887865592825
+          ],
+          "note": "Positive = the original (Gemini) judge favors Gemini-generated responses more than this judge does."
+        }
+      },
+      "stability": {
+        "raters": [
+          "original",
+          "gemini-2.5-flash/rep1",
+          "gemini-2.5-flash/rep2"
+        ],
+        "n_pairs": 10179,
+        "flip_rate": 0.08576480990274093,
+        "flip_rate_by_sign": {
+          "positive": 0.07003367003367003,
+          "negative": 0.12817719680464779
+        },
+        "fleiss_kappa": 0.8806154859283349,
+        "pairwise_cohen_kappa": {
+          "original vs gemini-2.5-flash/rep1": 0.8792992134961279,
+          "original vs gemini-2.5-flash/rep2": 0.8807702477162831,
+          "gemini-2.5-flash/rep1 vs gemini-2.5-flash/rep2": 0.8817810415641452
+        },
+        "case_score_sd_across_repeats": {
+          "mean": 0.05806918660681461,
+          "max": 0.26073883124692776
+        },
+        "configuration_level": {
+          "divide_and_conquer::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.007108857042030794,
+            "bootstrap_sd_over_cases": 0.037955732950818895
+          },
+          "divide_and_conquer::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.02055078371629738,
+            "bootstrap_sd_over_cases": 0.04257148433511079
+          },
+          "divide_and_conquer::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.008595350756615555,
+            "bootstrap_sd_over_cases": 0.048348396577910756
+          },
+          "divide_and_conquer_with_fact_checker::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.027284680234306913,
+            "bootstrap_sd_over_cases": 0.05345408960864609
+          },
+          "divide_and_conquer_with_fact_checker::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.015139404413849547,
+            "bootstrap_sd_over_cases": 0.037280555429456366
+          },
+          "divide_and_conquer_with_fact_checker::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.02592970500871248,
+            "bootstrap_sd_over_cases": 0.035035123564344864
+          },
+          "divide_and_conquer_with_subagents_auto_spawning::anthropic-claude-opus-4-8": {
+            "global_score_sd_across_repeats": 0.007811423648316762,
+            "bootstrap_sd_over_cases": 0.041429267998170406
+          },
+          "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.022439252089182935,
+            "bootstrap_sd_over_cases": 0.06440641074246697
+          },
+          "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.019670651182954888,
+            "bootstrap_sd_over_cases": 0.03358413567743801
+          },
+          "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.00237211226803239,
+            "bootstrap_sd_over_cases": 0.0345464028617144
+          },
+          "divide_and_conquer_with_subagents_auto_spawning::gpt-5.5-2026-04-23": {
+            "global_score_sd_across_repeats": 0.0009392543307910765,
+            "bootstrap_sd_over_cases": 0.040070190060126916
+          },
+          "single_llm_with_pubmed_search::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.017407988351048124,
+            "bootstrap_sd_over_cases": 0.044213523740369645
+          },
+          "single_llm_with_pubmed_search::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.006921942684232807,
+            "bootstrap_sd_over_cases": 0.030138420336574365
+          },
+          "single_llm_with_pubmed_search::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.01954680417780085,
+            "bootstrap_sd_over_cases": 0.03510450751261258
+          },
+          "single_llm_with_pubmed_search::gpt-5.5-2026-04-23": {
+            "global_score_sd_across_repeats": 0.02247967735893965,
+            "bootstrap_sd_over_cases": 0.041620142547496776
+          },
+          "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.013734663325672017,
+            "bootstrap_sd_over_cases": 0.03537739702456145
+          },
+          "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.0044355864524854086,
+            "bootstrap_sd_over_cases": 0.034565915334759834
+          },
+          "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.01924450390522728,
+            "bootstrap_sd_over_cases": 0.031160785120409984
+          },
+          "single_llm_with_web_search::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.00637883189501271,
+            "bootstrap_sd_over_cases": 0.03320524632889794
+          },
+          "single_llm_with_web_search::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.016300576182428632,
+            "bootstrap_sd_over_cases": 0.040741727859552046
+          },
+          "single_llm_with_web_search::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.012479709562431,
+            "bootstrap_sd_over_cases": 0.03213999855631811
+          },
+          "single_llm_with_web_search::gpt-5.5-2026-04-23": {
+            "global_score_sd_across_repeats": 0.009960572206491932,
+            "bootstrap_sd_over_cases": 0.03655928382103719
+          },
+          "single_llm_zero_shot::anthropic-claude-opus-4-8": {
+            "global_score_sd_across_repeats": 0.03616172103339232,
+            "bootstrap_sd_over_cases": 0.04012047628685196
+          },
+          "single_llm_zero_shot::gemini-gemini-2.5-flash": {
+            "global_score_sd_across_repeats": 0.0073175920443631125,
+            "bootstrap_sd_over_cases": 0.037739499856067754
+          },
+          "single_llm_zero_shot::gemini-gemini-3.1-pro-preview": {
+            "global_score_sd_across_repeats": 0.014579220765039312,
+            "bootstrap_sd_over_cases": 0.034226213531986655
+          },
+          "single_llm_zero_shot::gemini-gemini-3.5-flash": {
+            "global_score_sd_across_repeats": 0.009658813658627419,
+            "bootstrap_sd_over_cases": 0.033903439572462425
+          },
+          "single_llm_zero_shot::gpt-5.5-2026-04-23": {
+            "global_score_sd_across_repeats": 0.022966080921983132,
+            "bootstrap_sd_over_cases": 0.03153727143582311
+          }
+        },
+        "median_ratio_judge_sd_to_bootstrap_sd": 0.3882921631300984,
+        "kendall_tau_between_repeats": {
+          "original vs gemini-2.5-flash/rep1": 0.851851851851852,
+          "original vs gemini-2.5-flash/rep2": 0.7891737891737892,
+          "gemini-2.5-flash/rep1 vs gemini-2.5-flash/rep2": 0.8005698005698006
+        }
+      }
+    },
+    "gpt-5.4-mini": {
+      "meta": {
+        "judge": "litellm:gpt-5.4-mini-2026-03-17",
+        "temperature": null,
+        "seed": null,
+        "reasoning_effort": "medium",
+        "cases": [
+          "3",
+          "9",
+          "10",
+          "14",
+          "15",
+          "17",
+          "27",
+          "30",
+          "31",
+          "32",
+          "33",
+          "35",
+          "36",
+          "37",
+          "43",
+          "45",
+          "49",
+          "50",
+          "54",
+          "57",
+          "63",
+          "64",
+          "67",
+          "68"
+        ],
+        "configs": "all",
+        "runs": [
+          {
+            "judge": "litellm:gpt-5.4-mini-2026-03-17",
+            "temperature": null,
+            "seed": null,
+            "reasoning_effort": "medium",
+            "cases": [
+              "3",
+              "9",
+              "10",
+              "14",
+              "15",
+              "17",
+              "27",
+              "30",
+              "31",
+              "32",
+              "33",
+              "35",
+              "36",
+              "37",
+              "43",
+              "45",
+              "49",
+              "50",
+              "54",
+              "57",
+              "63",
+              "64",
+              "67",
+              "68"
+            ],
+            "configs": "all"
+          }
+        ]
+      },
+      "cross_judge_vs_original": {
+        "compared_label": "gpt-5.4-mini/rep1",
+        "criterion_level": {
+          "overall": {
+            "n": 10179,
+            "pct_agreement": 0.9132527753217409,
+            "cohen_kappa": 0.8141260340337044,
+            "gwet_ac1": 0.8379415673249936,
+            "met_rate_a": 0.3986639159052952,
+            "met_rate_b": 0.3356911287945771,
+            "a_met_b_not": 762,
+            "a_not_b_met": 121,
+            "cohen_kappa_ci": [
+              0.7810121187976323,
+              0.8463081211460308
+            ]
+          },
+          "positive": {
+            "n": 7425,
+            "pct_agreement": 0.9112457912457912,
+            "cohen_kappa": 0.8228477883955241,
+            "gwet_ac1": 0.8231527584900599,
+            "met_rate_a": 0.5073400673400673,
+            "met_rate_b": 0.4315151515151515,
+            "a_met_b_not": 611,
+            "a_not_b_met": 48
+          },
+          "negative": {
+            "n": 2754,
+            "pct_agreement": 0.9186637618010167,
+            "cohen_kappa": 0.5119686721253116,
+            "gwet_ac1": 0.9024440231592971,
+            "met_rate_a": 0.1056644880174292,
+            "met_rate_b": 0.07734204793028322,
+            "a_met_b_not": 151,
+            "a_not_b_met": 73
+          },
+          "by_category": {
+            "complementary_exams": {
+              "n": 3267,
+              "pct_agreement": 0.9412304866850322,
+              "cohen_kappa": 0.8562247066568136,
+              "gwet_ac1": 0.9007626981755144,
+              "met_rate_a": 0.30731558004285275,
+              "met_rate_b": 0.26323844505662686,
+              "a_met_b_not": 168,
+              "a_not_b_met": 24
+            },
+            "radiotherapy": {
+              "n": 1593,
+              "pct_agreement": 0.9347143753923415,
+              "cohen_kappa": 0.8692120291587262,
+              "gwet_ac1": 0.8698170451411235,
+              "met_rate_a": 0.4908976773383553,
+              "met_rate_b": 0.45448838669177655,
+              "a_met_b_not": 81,
+              "a_not_b_met": 23
+            },
+            "surgery": {
+              "n": 1431,
+              "pct_agreement": 0.8504542278127184,
+              "cohen_kappa": 0.7051870535456419,
+              "gwet_ac1": 0.7017277803588804,
+              "met_rate_a": 0.5394828791055206,
+              "met_rate_b": 0.40810621942697417,
+              "a_met_b_not": 201,
+              "a_not_b_met": 13
+            },
+            "systemic_therapy": {
+              "n": 3888,
+              "pct_agreement": 0.9040637860082305,
+              "cohen_kappa": 0.7910674831352671,
+              "gwet_ac1": 0.8232928076354961,
+              "met_rate_a": 0.38580246913580246,
+              "met_rate_b": 0.3212448559670782,
+              "a_met_b_not": 312,
+              "a_not_b_met": 61
+            }
+          }
+        },
+        "case_level": {
+          "n_responses": 648,
+          "pearson_r": 0.8179834368328458,
+          "spearman_rho": 0.8130620885746628,
+          "mean_score_original": 0.4902539642382992,
+          "mean_score_other": 0.4260236331402895
+        },
+        "configuration_level": {
+          "n_configs": 27,
+          "kendall_tau": 0.8689458689458691,
+          "kendall_tau_ci": [
+            0.6296296296296297,
+            0.8347578347578348
+          ],
+          "per_config": {
+            "divide_and_conquer::gemini-gemini-2.5-flash": {
+              "original": 0.43062138895201646,
+              "other": 0.3911057437368017,
+              "delta": -0.03951564521521478,
+              "delta_ci": [
+                -0.09115422074801761,
+                0.010892453051615384
+              ]
+            },
+            "divide_and_conquer::gemini-gemini-3.1-pro-preview": {
+              "original": 0.4873893762760561,
+              "other": 0.4169253410615961,
+              "delta": -0.07046403521445999,
+              "delta_ci": [
+                -0.1368400893851242,
+                -0.0029462993920926404
+              ]
+            },
+            "divide_and_conquer::gemini-gemini-3.5-flash": {
+              "original": 0.5441265729334841,
+              "other": 0.44015799782841314,
+              "delta": -0.10396857510507096,
+              "delta_ci": [
+                -0.1566240252998363,
+                -0.055955595518600576
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-2.5-flash": {
+              "original": 0.3658100727793266,
+              "other": 0.28776917485469966,
+              "delta": -0.07804089792462693,
+              "delta_ci": [
+                -0.11123975847775909,
+                -0.046711535682597186
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-3.1-pro-preview": {
+              "original": 0.46451523665163563,
+              "other": 0.425020330576199,
+              "delta": -0.03949490607543665,
+              "delta_ci": [
+                -0.09275113302402267,
+                0.013585290655047464
+              ]
+            },
+            "divide_and_conquer_with_fact_checker::gemini-gemini-3.5-flash": {
+              "original": 0.6514603208258395,
+              "other": 0.5333009003193321,
+              "delta": -0.1181594205065074,
+              "delta_ci": [
+                -0.1753077512655746,
+                -0.06286678315965066
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::anthropic-claude-opus-4-8": {
+              "original": 0.5856314422263512,
+              "other": 0.503675892558053,
+              "delta": -0.08195554966829821,
+              "delta_ci": [
+                -0.124355308753436,
+                -0.03762550137435597
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-2.5-flash": {
+              "original": 0.41016980282524496,
+              "other": 0.3525708725907246,
+              "delta": -0.05759893023452034,
+              "delta_ci": [
+                -0.1090969498171869,
+                -0.008057741328404654
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.1-pro-preview": {
+              "original": 0.5436513464744355,
+              "other": 0.47112981826094075,
+              "delta": -0.07252152821349472,
+              "delta_ci": [
+                -0.12828121030239328,
+                -0.013167676851523803
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gemini-gemini-3.5-flash": {
+              "original": 0.5982531051880723,
+              "other": 0.5263004859299811,
+              "delta": -0.07195261925809115,
+              "delta_ci": [
+                -0.11879630699409195,
+                -0.02445539991225336
+              ]
+            },
+            "divide_and_conquer_with_subagents_auto_spawning::gpt-5.5-2026-04-23": {
+              "original": 0.5845933995191112,
+              "other": 0.49344911720776635,
+              "delta": -0.0911442823113448,
+              "delta_ci": [
+                -0.13557434229502563,
+                -0.05072755120176012
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-2.5-flash": {
+              "original": 0.30931076105859096,
+              "other": 0.2779256647599837,
+              "delta": -0.03138509629860725,
+              "delta_ci": [
+                -0.07541923196068154,
+                0.01177791907364121
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-3.1-pro-preview": {
+              "original": 0.4848793042405779,
+              "other": 0.4429000681887076,
+              "delta": -0.04197923605187032,
+              "delta_ci": [
+                -0.089685461548908,
+                0.00582128077130612
+              ]
+            },
+            "single_llm_with_pubmed_search::gemini-gemini-3.5-flash": {
+              "original": 0.5611281425558278,
+              "other": 0.5002859570765941,
+              "delta": -0.0608421854792337,
+              "delta_ci": [
+                -0.10778047173145693,
+                -0.013756479867145772
+              ]
+            },
+            "single_llm_with_pubmed_search::gpt-5.5-2026-04-23": {
+              "original": 0.569371592228228,
+              "other": 0.47572169152138716,
+              "delta": -0.09364990070684082,
+              "delta_ci": [
+                -0.143254961584459,
+                -0.04475927813870297
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-2.5-flash": {
+              "original": 0.3528768402049926,
+              "other": 0.3199597178162712,
+              "delta": -0.03291712238872141,
+              "delta_ci": [
+                -0.0906942175050085,
+                0.022008236567317385
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.1-pro-preview": {
+              "original": 0.48833477175205936,
+              "other": 0.44219324028665247,
+              "delta": -0.04614153146540689,
+              "delta_ci": [
+                -0.10845032737957966,
+                0.01352065849442448
+              ]
+            },
+            "single_llm_with_pubmed_search_and_full_pmc_articles::gemini-gemini-3.5-flash": {
+              "original": 0.5573453679724202,
+              "other": 0.4757006590916249,
+              "delta": -0.08164470888079528,
+              "delta_ci": [
+                -0.13677678693563047,
+                -0.02751975757483905
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-2.5-flash": {
+              "original": 0.3708241221338568,
+              "other": 0.2960193068059444,
+              "delta": -0.07480481532791239,
+              "delta_ci": [
+                -0.11897581214848316,
+                -0.02976325119347769
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-3.1-pro-preview": {
+              "original": 0.46913156613832546,
+              "other": 0.43546503694960714,
+              "delta": -0.03366652918871832,
+              "delta_ci": [
+                -0.08147389462987523,
+                0.01070964570889256
+              ]
+            },
+            "single_llm_with_web_search::gemini-gemini-3.5-flash": {
+              "original": 0.5694323903083536,
+              "other": 0.5023802960194599,
+              "delta": -0.0670520942888937,
+              "delta_ci": [
+                -0.11897570698787277,
+                -0.01691875259429614
+              ]
+            },
+            "single_llm_with_web_search::gpt-5.5-2026-04-23": {
+              "original": 0.5356263378508063,
+              "other": 0.4684772817582726,
+              "delta": -0.06714905609253369,
+              "delta_ci": [
+                -0.11276606415527675,
+                -0.023687045780918986
+              ]
+            },
+            "single_llm_zero_shot::anthropic-claude-opus-4-8": {
+              "original": 0.47629056034259126,
+              "other": 0.3799467559091078,
+              "delta": -0.09634380443348345,
+              "delta_ci": [
+                -0.144661800826755,
+                -0.04983905998084163
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-2.5-flash": {
+              "original": 0.36642118780361804,
+              "other": 0.3429216405562861,
+              "delta": -0.023499547247331942,
+              "delta_ci": [
+                -0.07088291065648411,
+                0.02459847721887388
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-3.1-pro-preview": {
+              "original": 0.489848481793103,
+              "other": 0.42982701764212833,
+              "delta": -0.060021464150974646,
+              "delta_ci": [
+                -0.10377620315682781,
+                -0.01587238746592775
+              ]
+            },
+            "single_llm_zero_shot::gemini-gemini-3.5-flash": {
+              "original": 0.4902757203666675,
+              "other": 0.4655457325590094,
+              "delta": -0.024729987807658116,
+              "delta_ci": [
+                -0.0703775889750049,
+                0.01988052997384217
+              ]
+            },
+            "single_llm_zero_shot::gpt-5.5-2026-04-23": {
+              "original": 0.47953782303248677,
+              "other": 0.40596235292227467,
+              "delta": -0.0735754701102121,
+              "delta_ci": [
+                -0.11441471775042403,
+                -0.034181638005474205
+              ]
+            }
+          }
+        },
+        "self_preference": {
+          "gemini_minus_other_original": -0.06204157923638132,
+          "gemini_minus_other_other_judge": -0.03666241993609809,
+          "difference_in_differences": -0.025379159300283227,
+          "ci": [
+            -0.04965638776637462,
+            -0.0010695725814144224
+          ],
+          "note": "Positive = the original (Gemini) judge favors Gemini-generated responses more than this judge does."
+        }
+      },
+      "stability": null
+    }
+  },
+  "pairwise_between_regrade_judges": {
+    "claude-sonnet-5-5 vs gemini-2.5-flash": {
+      "n": 10179,
+      "pct_agreement": 0.9214068179585421,
+      "cohen_kappa": 0.8329497336903002,
+      "gwet_ac1": 0.8518437791698706,
+      "met_rate_a": 0.3547499754396306,
+      "met_rate_b": 0.39836919147263977,
+      "a_met_b_not": 178,
+      "a_not_b_met": 622
+    },
+    "claude-sonnet-5-5 vs gpt-5.4-mini": {
+      "n": 10179,
+      "pct_agreement": 0.9383043520974556,
+      "cohen_kappa": 0.8635861662240545,
+      "gwet_ac1": 0.8873988973941201,
+      "met_rate_a": 0.3547499754396306,
+      "met_rate_b": 0.3356911287945771,
+      "a_met_b_not": 411,
+      "a_not_b_met": 217
+    },
+    "gemini-2.5-flash vs gpt-5.4-mini": {
+      "n": 10179,
+      "pct_agreement": 0.9115826702033598,
+      "cohen_kappa": 0.8105081622909444,
+      "gwet_ac1": 0.834845698873507,
+      "met_rate_a": 0.39836919147263977,
+      "met_rate_b": 0.3356911287945771,
+      "a_met_b_not": 769,
+      "a_not_b_met": 131
+    }
+  }
+}

@@ -56,6 +56,26 @@ Return just the json object. Do not include any other text in the response.
 """.strip()
 
 
+def build_grader_prompt(evaluation_entry: EvaluationEntry, rubric) -> str:
+    """Build the exact grader prompt used for one (response, criterion) pair.
+
+    Kept as a function so validation re-grades (other judges, repeats) send
+    byte-identical prompts. Note what the judge actually receives:
+      * query: the repr of the `Prompt` object (list of messages with the
+        case summary);
+      * agent_response: the raw field, i.e. the Python repr of
+        ``{'text': ...}`` for multi-agent pipelines;
+      * rubric: the repr of the `Rubric` object, so the judge sees the
+        criterion text, its point value (and therefore its sign) and its
+        category tags, but not the other criteria or the reference decision.
+    """
+    return GRADER_TEMPLATE.format(
+        query=evaluation_entry.prompt,
+        agent_response=evaluation_entry.agent_response,
+        rubric=rubric,
+    )
+
+
 class AsyncBaseEvaluator(ABC):
     """
     Abstract base class for asynchronous evaluators.
@@ -212,6 +232,7 @@ class AsyncGeminiEvaluator(HealthBenchMetricsMixin, AsyncBaseEvaluator):
         model_id: str,
         api_key: Optional[str] = None,
         prompt_template: Optional[List[Message]] = None,
+        generation_config: Optional[dict] = None,
     ):
         """Initialize the asynchronous Gemini evaluator.
 
@@ -220,10 +241,15 @@ class AsyncGeminiEvaluator(HealthBenchMetricsMixin, AsyncBaseEvaluator):
             api_key: Optional API key for the Google GenAI client.
             prompt_template: Optional prompt template represented as a list of
                 messages. If not provided, a default grading template is used.
+            generation_config: Optional extra settings merged into the
+                request config (e.g. ``temperature``, ``seed``,
+                ``thinking_config``). When omitted, provider defaults apply,
+                which is how the reported results were graded.
         """
         self.model_id = model_id
         self.api_key = api_key
         self.client = genai.Client(api_key=api_key)
+        self.generation_config = generation_config or {}
 
         # Define prompt template
         self.prompt_template = prompt_template
@@ -242,7 +268,6 @@ class AsyncGeminiEvaluator(HealthBenchMetricsMixin, AsyncBaseEvaluator):
             inputs, desc="Grading responses", total=len(inputs)
         ):
             entry_level_grader_responses: List[GraderResponse] = []
-            agent_response = evaluation_entry.agent_response
 
             async with asyncio.TaskGroup() as tg:
                 tasks = []
@@ -251,20 +276,21 @@ class AsyncGeminiEvaluator(HealthBenchMetricsMixin, AsyncBaseEvaluator):
                         tg.create_task(
                             self.client.aio.models.generate_content(
                                 model=self.model_id,
-                                contents=GRADER_TEMPLATE.format(
-                                    query=evaluation_entry.prompt,
-                                    agent_response=agent_response,
-                                    rubric=rubric,
-                                ),
+                                contents=build_grader_prompt(evaluation_entry, rubric),
                                 config={
                                     "response_mime_type": "application/json",
                                     "response_json_schema": GraderResponse.model_json_schema(),
+                                    **self.generation_config,
                                 },
                             )
                         )
                     )
 
             responses: List[types.GenerateContentResponse] = [t.result() for t in tasks]
+            # Record the exact model version that served the grades.
+            evaluation_entry.grader_model_versions = sorted(
+                {r.model_version for r in responses if getattr(r, "model_version", None)}
+            )
             for response in responses:
                 try:
                     result = GraderResponse.model_validate_json(response.text)
