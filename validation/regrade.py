@@ -104,10 +104,18 @@ def parse_verdict(text: str) -> GraderResponse:
 
 
 class Judge:
-    def __init__(self, spec: str, temperature: float | None, seed: int | None, reasoning_effort: str | None = None):
+    def __init__(
+        self,
+        spec: str,
+        temperature: float | None,
+        seed: int | None,
+        reasoning_effort: str | None = None,
+        openrouter_provider: str | None = None,
+    ):
         self.backend, self.model = spec.split(":", 1)
         self.temperature, self.seed = temperature, seed
         self.reasoning_effort = reasoning_effort
+        self.openrouter_provider = openrouter_provider
         if self.backend == "gemini":
             from google import genai
 
@@ -143,6 +151,9 @@ class Judge:
             kwargs["temperature"] = self.temperature
         if self.seed is not None:
             kwargs["seed"] = self.seed
+        if self.openrouter_provider:
+            # Serve only from this upstream provider, never fall back to another host.
+            kwargs["extra_body"] = {"provider": {"order": [self.openrouter_provider], "allow_fallbacks": False}}
         r = await self.litellm.acompletion(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
@@ -151,7 +162,13 @@ class Judge:
         )
         usage = r.usage.model_dump() if getattr(r, "usage", None) else {}
         cost = (getattr(r, "_hidden_params", None) or {}).get("response_cost")
-        return {"text": r.choices[0].message.content, "model_version": r.model, "usage": usage, "cost": cost}
+        return {
+            "text": r.choices[0].message.content,
+            "model_version": r.model,
+            "served_by": getattr(r, "provider", None),
+            "usage": usage,
+            "cost": cost,
+        }
 
 
 async def run_rep(judge: Judge, jobs: list[dict], out_path: Path, concurrency: int) -> bool:
@@ -205,6 +222,7 @@ async def run_rep(judge: Judge, jobs: list[dict], out_path: Path, concurrency: i
                             model_version=raw["model_version"],
                             usage=raw["usage"],
                             cost=raw.get("cost"),
+                            served_by=raw.get("served_by"),
                             error=None,
                         )
                         break
@@ -247,6 +265,7 @@ def main() -> None:
     p.add_argument("--configs", nargs="*", default=None, help="Restrict to these pipeline::model configurations.")
     p.add_argument("--temperature", type=float, default=None, help="Default: provider default, as in the original grading.")
     p.add_argument("--seed", type=int, default=None)
+    p.add_argument("--openrouter-provider", default=None, help="OpenRouter only: pin the upstream provider (e.g. openai), no fallbacks.")
     p.add_argument("--reasoning-effort", default=None, help="e.g. low / medium / high (LiteLLM judges). Default: provider default.")
     p.add_argument("--concurrency", type=int, default=16)
     p.add_argument(
@@ -282,7 +301,7 @@ def main() -> None:
     if args.dry_run:
         return
 
-    judge = Judge(args.judge, args.temperature, args.seed, args.reasoning_effort)
+    judge = Judge(args.judge, args.temperature, args.seed, args.reasoning_effort, args.openrouter_provider)
     out_dir = ensure_output_dir() / "regrades" / (args.slug or judge_slug(args.judge))
     out_dir.mkdir(parents=True, exist_ok=True)
     meta_path = out_dir / "meta.json"
@@ -292,6 +311,7 @@ def main() -> None:
         "temperature": args.temperature,
         "seed": args.seed,
         "reasoning_effort": args.reasoning_effort,
+        "openrouter_provider": args.openrouter_provider,
         "cases": sorted(cases, key=int) if cases is not None else "all",
         "configs": args.configs or "all",
     }
