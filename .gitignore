@@ -10,3 +10,6 @@ reference_validators.py
 eval_dataset_eda
 evals/*
 results/*
+# Clinician review materials and outputs: contain patient data, never commit
+validation/output/
+*.xlsx
