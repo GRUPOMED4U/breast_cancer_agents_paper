@@ -18,7 +18,7 @@ import collections
 import csv
 import random
 
-from common import SEED, STAGE0_PATTERN, ensure_output_dir, load_cases
+from common import SEED, STAGE0_PATTERN, ensure_output_dir, guard_overwrite, load_cases
 
 GROUPS = ("shared", "onc1", "onc2")
 CALIBRATION_STAGES = ("2", "4")
@@ -28,7 +28,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--per-group", type=int, default=3, help="Cases per stage per group (3 = full design, 2 = reduced).")
     parser.add_argument("--seed", type=int, default=SEED)
+    parser.add_argument("--force", action="store_true", help="Overwrite an existing allocation.csv.")
     args = parser.parse_args()
+    guard_overwrite([ensure_output_dir() / "allocation.csv"], args.force)
 
     rng = random.Random(args.seed)
     cases = load_cases()

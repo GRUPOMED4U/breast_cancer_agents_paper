@@ -27,13 +27,14 @@ Usage:
 
 from __future__ import annotations
 
+import argparse
 import collections
 import csv
 import json
 import random
 import re
 
-from common import SEED, ensure_output_dir, load_cases, load_evaluated_responses, response_text
+from common import SEED, ensure_output_dir, guard_overwrite, load_cases, load_evaluated_responses, response_text
 
 MIN_WORDS = 150
 REFUSAL = re.compile(r"\bas an ai\b|unable to perform the requested task|não posso (ajudar|realizar)", re.IGNORECASE)
@@ -87,16 +88,8 @@ def blind(text: str, patient_id: str | None, case_code: str) -> tuple[str, int, 
     return text, n_ids + n_ctx, n_give
 
 
-def main() -> None:
-    rng = random.Random(SEED)
-    out_dir = ensure_output_dir()
-    alloc_path = out_dir / "allocation.csv"
-    if not alloc_path.exists():
-        raise SystemExit("Run validation/sample_cases.py first.")
-    with open(alloc_path, encoding="utf-8") as f:
-        allocation = list(csv.DictReader(f))
-
-    cases = load_cases()
+def load_candidates(rng: random.Random) -> dict[str, list[dict]]:
+    """All evaluated responses per case, with eligibility, blinding flags and within-case terciles."""
     by_case: dict[str, list[dict]] = collections.defaultdict(list)
     for r in load_evaluated_responses():
         text = response_text(r["agent_response"])
@@ -114,9 +107,12 @@ def main() -> None:
         n = len(ranked)
         for rank, r in enumerate(ranked):
             r["tercile"] = ("low", "mid", "high")[min(2, rank * 3 // n)]
+    return by_case
 
-    # Balanced target terciles: within each group and stage, one case per tercile
-    # (when 3 cases per stage); otherwise rotate.
+
+def assign_targets(allocation: list[dict], rng: random.Random) -> dict[str, str]:
+    """Balanced target terciles: within each group and stage, one case per tercile
+    (when 3 cases per stage); otherwise rotate."""
     targets: dict[str, str] = {}
     cells = collections.defaultdict(list)
     for a in allocation:
@@ -128,9 +124,17 @@ def main() -> None:
         rng.shuffle(terciles)
         for i, code in enumerate(codes):
             targets[code] = terciles[i % 3] if key[0] != "calibration" else "mid"
+    return targets
 
-    config_uses = collections.Counter()
-    topup_uses = collections.Counter()
+
+def select(allocation, cases, by_case, targets, rng, config_uses=None, topup_uses=None):
+    """Pick and blind a primary and a top-up response for every allocated case.
+
+    ``config_uses``/``topup_uses`` can be pre-filled with earlier selections so a
+    later extension keeps spreading responses over configurations.
+    """
+    config_uses = config_uses if config_uses is not None else collections.Counter()
+    topup_uses = topup_uses if topup_uses is not None else collections.Counter()
     selected, key_rows = [], []
     for a in sorted(allocation, key=lambda a: a["case_code"]):
         code, pid = a["case_code"], a["prompt_id"]
@@ -178,8 +182,11 @@ def main() -> None:
                     "pipeline_phrases_redacted": n_give,
                 }
             )
+    return selected, key_rows, config_uses
 
-    with open(out_dir / "selected_responses.jsonl", "w", encoding="utf-8") as f:
+
+def write_outputs(out_dir, selected, key_rows, config_uses, suffix: str = "") -> None:
+    with open(out_dir / f"selected_responses{suffix}.jsonl", "w", encoding="utf-8") as f:
         for s in selected:
             f.write(json.dumps(s, ensure_ascii=False) + "\n")
 
@@ -190,10 +197,10 @@ def main() -> None:
         for m in check_re.finditer(s["text"]):
             ctx = s["text"][max(0, m.start() - 120) : m.end() + 100].replace("\n", " ")
             review_lines.append(f"{s['case_code']}\t{s['slot']}\t{m.group(0)}\t{ctx}")
-    (out_dir / "blinding_review.tsv").write_text(
+    (out_dir / f"blinding_review{suffix}.tsv").write_text(
         "case_code\tslot\tmatch\tcontext\n" + "\n".join(review_lines) + "\n", encoding="utf-8"
     )
-    with open(out_dir / "answer_key_responses.csv", "w", newline="", encoding="utf-8") as f:
+    with open(out_dir / f"answer_key_responses{suffix}.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(key_rows[0].keys()))
         writer.writeheader()
         writer.writerows(key_rows)
@@ -204,11 +211,31 @@ def main() -> None:
     print("  primary terciles:", dict(collections.Counter(k["within_case_tercile"] for k in prim)))
     print("  primary pipelines:", dict(collections.Counter(k["pipeline"] for k in prim)))
     print("  primary models:", dict(collections.Counter(k["model"] for k in prim)))
-    print("  max uses of one config (primary):", max(config_uses.values()), f"over {len(config_uses)} configs")
+    print("  max uses of one config (primary, cumulative):", max(config_uses.values()), f"over {len(config_uses)} configs")
     print("  top-ups with >=1 negative criterion met by judge:", sum(k["judge_negatives_met"] > 0 for k in top), "/", len(top))
     print("  responses with patient IDs redacted:", sum(k["patient_ids_redacted"] > 0 for k in key_rows))
     print("  responses with pipeline phrases redacted:", sum(k["pipeline_phrases_redacted"] > 0 for k in key_rows))
-    print(f"Wrote {out_dir / 'selected_responses.jsonl'} and {out_dir / 'answer_key_responses.csv'}")
+    print(f"Wrote selected_responses{suffix}.jsonl, answer_key_responses{suffix}.csv, blinding_review{suffix}.tsv in {out_dir}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--force", action="store_true", help="Overwrite existing selections.")
+    args = parser.parse_args()
+    rng = random.Random(SEED)
+    out_dir = ensure_output_dir()
+    guard_overwrite([out_dir / "selected_responses.jsonl", out_dir / "answer_key_responses.csv"], args.force)
+    alloc_path = out_dir / "allocation.csv"
+    if not alloc_path.exists():
+        raise SystemExit("Run validation/sample_cases.py first.")
+    with open(alloc_path, encoding="utf-8") as f:
+        allocation = list(csv.DictReader(f))
+
+    cases = load_cases()
+    by_case = load_candidates(rng)
+    targets = assign_targets(allocation, rng)
+    selected, key_rows, config_uses = select(allocation, cases, by_case, targets, rng)
+    write_outputs(out_dir, selected, key_rows, config_uses)
 
 
 if __name__ == "__main__":

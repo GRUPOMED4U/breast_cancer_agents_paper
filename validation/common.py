@@ -36,6 +36,21 @@ def ensure_output_dir() -> Path:
     return OUTPUT_DIR
 
 
+def guard_overwrite(paths, force: bool) -> None:
+    """Refuse to overwrite review materials that may already be in reviewers' hands.
+
+    Regenerating the allocation or selections changes which cases/responses
+    reviewers see, so existing outputs are only replaced with --force.
+    """
+    existing = [str(p) for p in paths if Path(p).exists()]
+    if existing and not force:
+        raise SystemExit(
+            "Refusing to overwrite existing review materials (already sent to reviewers?):\n  "
+            + "\n  ".join(existing)
+            + "\nRe-run with --force only if you really want to regenerate them."
+        )
+
+
 def _maybe_literal(value):
     """Eval files store some fields as Python reprs; parse them back."""
     if isinstance(value, str) and value[:1] in "[{":

@@ -30,6 +30,7 @@ Usage:
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import math
@@ -41,7 +42,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.properties import Outline
 
-from common import SEED, deidentify_summary, ensure_output_dir, load_cases
+from common import SEED, deidentify_summary, ensure_output_dir, guard_overwrite, load_cases
 
 # ---------------------------------------------------------------------------
 # Clinician-facing labels (Portuguese). Edit here to change wording/language.
@@ -330,7 +331,12 @@ def build_workbook(path, codes, cases, alloc_by_code, responses):
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--force", action="store_true", help="Overwrite existing workbooks.")
+    args = parser.parse_args()
     out_dir = ensure_output_dir()
+    wb_dir = out_dir / "workbooks"
+    guard_overwrite([wb_dir / "revisao_oncologista_1.xlsx", wb_dir / "revisao_oncologista_2.xlsx", wb_dir / "calibracao.xlsx", out_dir / "answer_key_rubrics.csv"], args.force)
     with open(out_dir / "allocation.csv", encoding="utf-8") as f:
         allocation = list(csv.DictReader(f))
     alloc_by_code = {a["case_code"]: a for a in allocation}

@@ -15,7 +15,22 @@ Run from the repository root, in this order:
 .venv/Scripts/python.exe validation/rubric_descriptives.py # descriptives/
 ```
 
-Everything is seeded (`SEED = 2026` in `common.py`), so re-running gives the same sample, the same responses and the same workbooks.
+Everything is seeded (`SEED = 2026` in `common.py`), so re-running gives the same sample, the same responses and the same workbooks. The scripts **refuse to overwrite** existing allocations, selections or workbooks (they may already be with reviewers) unless you pass `--force`.
+
+### Part 2: full coverage for a reviewer
+
+```bash
+.venv/Scripts/python.exe validation/extend_review.py --reviewer 1   # revisao_oncologista_1_parte2.xlsx
+```
+
+This builds a second workbook with **every** dataset case the reviewer did not see in part 1. The script asserts that part 1 + part 2 = all 72 cases, with no overlap. For oncologist 1 that is 48 cases:
+- the 12 cases unique to oncologist 2, with the same responses oncologist 2 saw,
+- the 2 calibration cases,
+- 34 never-sampled cases, 3 of them stage 0 / DCIS (#12).
+
+The never-sampled cases get their codes (R37–R70) and responses **once**, in `*_extension.*` files, and those are reused for every reviewer. Running `--reviewer 2` later therefore gives both oncologists identical material, so agreement can be measured on all 72 cases.
+
+In the analysis, keep in mind that answers on the calibration cases are not independent, because they were discussed jointly in training. `assignments_oncologista_<n>_parte2.csv` records where each part-2 case came from.
 
 ## Design choices (see #14)
 
